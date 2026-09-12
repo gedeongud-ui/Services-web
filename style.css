@@ -73,6 +73,26 @@ body {
     transition: transform 0.3s, box-shadow 0.3s;
     margin: 5px;
 }
+/* BOUTON WHATSAPP */
+.btn-whatsapp {
+    background-color: #25D366;
+    color: white;
+    font-size: 1.1rem;
+    padding: 14px 30px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.btn-whatsapp:hover {
+    background-color: #1eb954;
+    transform: translateY(-3px);
+}
 
 .btn-primary {
     background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
