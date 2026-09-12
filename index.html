@@ -3,34 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Premier Site Web</title>
+    <title>Blessing TSIOBINDA | Portfolio</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Icônes FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <header>
-        <h1>Bienvenue sur ma Page Web</h1>
-        <p>Mon premier projet web créé avec passion !</p>
+    <!-- SECTION EN-TÊTE -->
+    <header class="hero">
+        <div class="hero-content">
+            <div class="profile-img">
+                <i class="fa-solid fa-user-astronaut"></i>
+            </div>
+            <h1>Blessing TSIOBINDA</h1>
+            <p class="subtitle">Étudiant en Gestion & Passionné de Tech & Création</p>
+            <div class="social-links">
+                <a href="#" class="btn-social"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="btn-social"><i class="fab fa-github"></i></a>
+                <a href="#" class="btn-social"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
     </header>
 
-    <main>
+    <main class="container">
+
+        <!-- SECTION À PROPOS -->
         <section class="card">
-            <h2>À propos de moi</h2>
-            <p>Bonjour ! Je débute dans la création de sites web et voici ma toute première page.</p>
+            <h2><i class="fa-solid fa-user"></i> À Propos de Moi</h2>
+            <p>Bienvenue sur ma page personnelle ! Passionné par le numérique, la gestion et la création, je développe continuellement de nouvelles compétences pour concevoir des projets modernes et à forte valeur ajoutée.</p>
         </section>
 
+        <!-- SECTION MES COMPÉTENCES -->
         <section class="card">
-            <h2>Mes Objectifs</h2>
-            <ul>
-                <li>Apprendre le HTML & le CSS</li>
-                <li>Créer des sites modernes et utiles</li>
-                <li>Développer de nouvelles compétences</li>
-            </ul>
+            <h2><i class="fa-solid fa-lightbulb"></i> Mes Domaines d'Expertise</h2>
+            
+            <div class="skill">
+                <span>Bureautique & Gestion (Word, Excel, Sage)</span>
+                <div class="skill-bar"><div class="skill-level" style="width: 90%;"></div></div>
+            </div>
+
+            <div class="skill">
+                <span>Développement Web (HTML/CSS)</span>
+                <div class="skill-bar"><div class="skill-level" style="width: 75%;"></div></div>
+            </div>
+
+            <div class="skill">
+                <span>Création & Audio / Multimédia</span>
+                <div class="skill-bar"><div class="skill-level" style="width: 80%;"></div></div>
+            </div>
         </section>
+
+        <!-- SECTION MES PROJETS ET SERVICES -->
+        <section class="card">
+            <h2><i class="fa-solid fa-rocket"></i> Mes Services & Projets</h2>
+            <div class="projects-grid">
+                
+                <div class="project-box">
+                    <i class="fa-solid fa-laptop-code project-icon"></i>
+                    <h3>Création Web</h3>
+                    <p>Conception de pages web modernes, simples et hébergées gratuitement pour particuliers ou projets.</p>
+                </div>
+
+                <div class="project-box">
+                    <i class="fa-solid fa-chalkboard-user project-icon"></i>
+                    <h3>Formation Bureautique</h3>
+                    <p>Accompagnement pratique sur l'utilisation avancée de Word, Excel et outils de gestion.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION CONTACT -->
+        <section class="card contact-card">
+            <h2><i class="fa-solid fa-envelope"></i> Me Contacter</h2>
+            <p>Un projet ou une question ? N'hésite pas à me laisser un message direct.</p>
+            <a href="mailto:contact@exemple.com" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> M'envoyer un e-mail</a>
+        </section>
+
     </main>
 
     <footer>
-        <p>© 2026 - Tous droits réservés</p>
+        <p>© 2026 Blessing TSIOBINDA — Fait avec passion</p>
     </footer>
 
 </body>
