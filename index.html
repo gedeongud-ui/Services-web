@@ -3,88 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blessing TSIOBINDA | Portfolio</title>
+    <title>Blessing TSIOBINDA | Portfolio & Projets</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Icônes FontAwesome -->
+    <!-- FontAwesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- SECTION EN-TÊTE -->
-    <header class="hero">
+    <!-- HERO SECTION AVEC IMAGE DE FOND ET OVERLAY -->
+    <header class="hero-banner">
+        <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="profile-img">
-                <i class="fa-solid fa-user-astronaut"></i>
+            <div class="profile-frame">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Photo de profil" class="profile-img">
             </div>
             <h1>Blessing TSIOBINDA</h1>
-            <p class="subtitle">Étudiant en Gestion & Passionné de Tech & Création</p>
-            <div class="social-links">
-                <a href="#" class="btn-social"><i class="fab fa-linkedin-in"></i></a>
-                <a href="#" class="btn-social"><i class="fab fa-github"></i></a>
-                <a href="#" class="btn-social"><i class="fab fa-whatsapp"></i></a>
+            <p class="subtitle">Créateur Numérique, Passionné de Tech & Gestion</p>
+            <div class="hero-buttons">
+                <a href="#projets" class="btn btn-primary"><i class="fa-solid fa-eye"></i> Voir mes réalisations</a>
+                <a href="#contact" class="btn btn-secondary"><i class="fa-solid fa-paper-plane"></i> Me contacter</a>
             </div>
         </div>
     </header>
 
     <main class="container">
 
-        <!-- SECTION À PROPOS -->
-        <section class="card">
-            <h2><i class="fa-solid fa-user"></i> À Propos de Moi</h2>
-            <p>Bienvenue sur ma page personnelle ! Passionné par le numérique, la gestion et la création, je développe continuellement de nouvelles compétences pour concevoir des projets modernes et à forte valeur ajoutée.</p>
-        </section>
-
-        <!-- SECTION MES COMPÉTENCES -->
-        <section class="card">
-            <h2><i class="fa-solid fa-lightbulb"></i> Mes Domaines d'Expertise</h2>
-            
-            <div class="skill">
-                <span>Bureautique & Gestion (Word, Excel, Sage)</span>
-                <div class="skill-bar"><div class="skill-level" style="width: 90%;"></div></div>
+        <!-- À PROPOS AVEC ILLUSTATION -->
+        <section class="card about-section">
+            <div class="about-text">
+                <h2><i class="fa-solid fa-user-astronaut"></i> À Propos de Moi</h2>
+                <p>Bienvenue sur mon espace interactif ! Passionné par le développement web, le design et les technologies modernes, je crée des expériences visuelles captivantes et des solutions numériques sur mesure.</p>
             </div>
-
-            <div class="skill">
-                <span>Développement Web (HTML/CSS)</span>
-                <div class="skill-bar"><div class="skill-level" style="width: 75%;"></div></div>
-            </div>
-
-            <div class="skill">
-                <span>Création & Audio / Multimédia</span>
-                <div class="skill-bar"><div class="skill-level" style="width: 80%;"></div></div>
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80" alt="Espace de travail numérique">
             </div>
         </section>
 
-        <!-- SECTION MES PROJETS ET SERVICES -->
-        <section class="card">
-            <h2><i class="fa-solid fa-rocket"></i> Mes Services & Projets</h2>
-            <div class="projects-grid">
-                
-                <div class="project-box">
-                    <i class="fa-solid fa-laptop-code project-icon"></i>
-                    <h3>Création Web</h3>
-                    <p>Conception de pages web modernes, simples et hébergées gratuitement pour particuliers ou projets.</p>
+        <!-- GALERIE DES PROJETS AVEC CARTES VISUELLES -->
+        <section id="projets" class="section-title">
+            <h2><i class="fa-solid fa-layer-group"></i> Projets & Services à la une</h2>
+            <p>Découvre ce que je conçois au quotidien</p>
+        </section>
+
+        <div class="grid-projects">
+
+            <div class="project-card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80" alt="Création Web">
+                    <span class="badge">Web Design</span>
                 </div>
-
-                <div class="project-box">
-                    <i class="fa-solid fa-chalkboard-user project-icon"></i>
-                    <h3>Formation Bureautique</h3>
-                    <p>Accompagnement pratique sur l'utilisation avancée de Word, Excel et outils de gestion.</p>
+                <div class="card-body">
+                    <h3>Sites Web Modernes</h3>
+                    <p>Création de pages vitrines captivantes, élégantes et optimisées pour mobiles et ordinateurs.</p>
+                    <a href="#" class="card-link">En savoir plus <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
-
             </div>
-        </section>
+
+            <div class="project-card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" alt="Bureautique & Code">
+                    <span class="badge">Tech & Management</span>
+                </div>
+                <div class="card-body">
+                    <h3>Solutions Bureautiques</h3>
+                    <p>Accompagnement pratique et création de supports structurés avec les meilleurs outils du marché.</p>
+                    <a href="#" class="card-link">En savoir plus <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80" alt="Création Audio">
+                    <span class="badge">Audio & Multimédia</span>
+                </div>
+                <div class="card-body">
+                    <h3>Production Digital Audio</h3>
+                    <p>Travail créatif sur l'édition sonore, les arrangements musicaux et la structuration audio.</p>
+                    <a href="#" class="card-link">En savoir plus <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+        </div>
 
         <!-- SECTION CONTACT -->
-        <section class="card contact-card">
-            <h2><i class="fa-solid fa-envelope"></i> Me Contacter</h2>
-            <p>Un projet ou une question ? N'hésite pas à me laisser un message direct.</p>
-            <a href="mailto:contact@exemple.com" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> M'envoyer un e-mail</a>
+        <section id="contact" class="card contact-banner">
+            <div class="contact-content">
+                <h2>Envie de collaborer sur un projet ?</h2>
+                <p>N'hésite pas à m'envoyer un message pour discuter de tes idées !</p>
+                <a href="mailto:contact@exemple.com" class="btn btn-primary btn-lg"><i class="fa-solid fa-envelope"></i> M'envoyer un message</a>
+            </div>
         </section>
 
     </main>
 
     <footer>
-        <p>© 2026 Blessing TSIOBINDA — Fait avec passion</p>
+        <p>© 2026 Blessing TSIOBINDA — Tous droits réservés</p>
     </footer>
 
 </body>
