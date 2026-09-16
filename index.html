@@ -451,9 +451,9 @@
 
     <!-- BARRE DE NAVIGATION FLÈCHES MANUELLES -->
     <div class="step-nav-bar">
-        <button class="nav-arrow" id="prevStepBtn" title="Étape précédente" onclick="changeStep(-1)">←</button>
+        <button class="nav-arrow" id="prevStepBtn" title="Étape précédente">←</button>
         <div class="step-indicator" id="stepIndicatorTitle">1. ACCUEIL</div>
-        <button class="nav-arrow" id="nextStepBtn" title="Étape suivante" onclick="changeStep(1)">→</button>
+        <button class="nav-arrow" id="nextStepBtn" title="Étape suivante">→</button>
     </div>
 
     <!-- ÉTAPE 1 : PAGE D'ACCUEIL -->
@@ -526,7 +526,7 @@
     <!-- ÉTAPE 3 : CHOIX CHAMBRE -->
     <div class="step-content" id="step3">
         <div style="background: var(--light-bg); padding: 10px 12px; border: 1px solid var(--border-color); margin-bottom: 12px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;">
-            <div id="summaryBarText">Du 15/09 au 16/09<br>1 chambre, 2 adultes</div>
+            <div id="summaryBarText">Du --/-- au --/--<br>1 chambre, 2 adultes</div>
             <button onclick="goToStep(2)" style="background: none; border: none; text-decoration: underline; cursor: pointer; font-size: 11px; color: var(--primary-bordeaux);" data-i18n="btnModify">Modifier</button>
         </div>
 
@@ -582,7 +582,7 @@
             <!-- OPTION NAVETTE -->
             <div class="form-group" style="background: var(--gold-light); padding: 12px; border: 1px solid var(--gold-accent); border-radius: 6px; margin-top: 15px;">
                 <div style="display: flex; gap: 10px; align-items: flex-start;">
-                    <input type="checkbox" id="airportShuttle" style="width: 20px; height: 20px; margin-top: 2px;" onchange="updateTotalPriceCalculation()">
+                    <input type="checkbox" id="airportShuttle" style="width: 20px; height: 20px; margin-top: 2px;">
                     <div>
                         <label for="airportShuttle" style="margin: 0; color: var(--primary-bordeaux); font-size: 12px; text-transform: none; cursor: pointer;">
                             <strong data-i18n="shuttleTitle">🚙 Navette / Transfert Aéroport Maya-Maya (+15 000 FCFA)</strong>
@@ -594,7 +594,7 @@
                 </div>
             </div>
 
-            <button type="button" class="btn-primary" onclick="goToStep(5)" data-i18n="btnStep4">Générer mon ticket de réservation</button>
+            <button type="button" class="btn-primary" onclick="submitStep4()" data-i18n="btnStep4">Générer mon ticket de réservation</button>
         </form>
     </div>
 
@@ -715,24 +715,39 @@
         </div>
 
         <div class="legal-links">
-            © 2026 Groupe Edmond Hôtel. Tous droits réservés.<br>
-            Mentions légales • Politique de confidentialité
+            &copy; 2026 Edmond Hôtel Brazzaville. Tous droits réservés.<br>
+            Mentions Légales | Politique de Confidentialité | CGV
         </div>
     </div>
 </div>
 
-<!-- SCRIPT JAVASCRIPT COMPLET ET INTERACTIF -->
 <script>
-    // ÉTAT DE L'APPLICATION
+    /* VARIABLES GLOBALES */
     let currentStep = 1;
     let currentLang = 'FR';
-    let currentCategoryFilter = 'all';
-    let visibleRoomsLimit = 5;
+    let selectedCategory = 'all';
+    let displayedRoomCount = 5;
     let selectedRoom = null;
-    let computedTotalPrice = 0;
-    let currentRefNumber = '';
+    let allRooms = [];
 
-    // DICTIONNAIRE MULTILINGUE (FR / EN)
+    const stepTitles = {
+        FR: {
+            1: "1. ACCUEIL",
+            2: "2. DATES & OCCUPANTS",
+            3: "3. CHOIX DE LA CHAMBRE",
+            4: "4. VOS COORDONNÉES",
+            5: "5. TICKET DE RÉSERVATION"
+        },
+        EN: {
+            1: "1. HOME",
+            2: "2. DATES & GUESTS",
+            3: "3. ROOM SELECTION",
+            4: "4. YOUR DETAILS",
+            5: "5. BOOKING TICKET"
+        }
+    };
+
+    /* DICTIONNAIRE DE TRADUCTION BILINGUE FR / EN */
     const i18n = {
         FR: {
             menuHome: "Page d'accueil",
@@ -806,28 +821,28 @@
             menuRooftop: "Rooftop Restaurant (6th Fl.)",
             menuLang: "Language (FR / EN)",
             welcomeSub: "Welcome to Edmond Hotel",
-            welcomeTitle: "A Luxurious Stay in the Heart of Brazzaville",
-            rooftopBannerTitle: "🍽️ Restaurant & Rooftop on 6th Floor",
-            rooftopBannerDesc: "Enjoy gastronomic creations and new desserts from our Chef on the rooftop terrace with breathtaking views over Brazzaville.",
-            welcomeDesc: "Ideally located at 24 Avenue des 3 Martyrs in Plateaux des 15 ans, Edmond Group welcomes you with 100 refined rooms, private parking, high-speed Wi-Fi, and tailored service.",
-            btnStart: "Book My Stay Now",
+            welcomeTitle: "A luxurious stay in the heart of Brazzaville",
+            rooftopBannerTitle: "🍽️ 6th Floor Restaurant & Rooftop",
+            rooftopBannerDesc: "Enjoy fine dining and handcrafted desserts on our rooftop terrace overlooking Brazzaville.",
+            welcomeDesc: "Ideally located at 24 Avenue des 3 Martyrs (Plateaux des 15 ans), Groupe Edmond offers 100 refined rooms, private parking, high-speed Wi-Fi, and personalized service.",
+            btnStart: "Book my stay now",
             step2Title: "Dates & Guests",
             lblCheckin: "Check-in Date",
             lblCheckout: "Check-out Date",
-            lblTime: "Expected Check-in Time",
-            lblOccupants: "Number of Rooms & Guests",
+            lblTime: "Estimated Arrival Time",
+            lblOccupants: "Rooms & Guests",
             lblRooms: "Room(s)",
             lblAdults: "Adult(s)",
             lblChildren: "Child(ren)",
             lblPromo: "Promo Code (Optional)",
             btnStep2: "View our 100 rooms",
             btnModify: "Edit",
-            step3Title: "Choose Your Room",
+            step3Title: "Select your room",
             filterAll: "All (100)",
             filterStandard: "Standard",
             filterVip: "VIP & Luxury",
             filterMulti: "2+ Rooms",
-            btnLoadMore: "Load More Rooms (+)",
+            btnLoadMore: "Load more rooms (+)",
             step4Title: "Guest Information",
             lblCivility: "Title *",
             lblFirstName: "First Name *",
@@ -835,11 +850,11 @@
             lblPhone: "Phone / WhatsApp *",
             lblEmail: "Email Address *",
             lblCountry: "Country of Residence *",
-            shuttleTitle: "🚙 Shuttle / Maya-Maya Airport Transfer (+15,000 FCFA)",
-            shuttleDesc: "Personalized pickup upon your arrival at Brazzaville airport.",
-            btnStep4: "Generate Reservation Ticket",
-            step5Title: "Ticket Validation",
-            step5Desc: "Here is your booking ticket for Edmond Hotel. Send it to reception to confirm payment details.",
+            shuttleTitle: "🚙 Maya-Maya Airport Shuttle (+15,000 FCFA)",
+            shuttleDesc: "Personalized pick-up service upon your arrival at Maya-Maya Airport.",
+            btnStep4: "Generate my booking ticket",
+            step5Title: "Ticket Confirmation",
+            step5Desc: "Here is your booking ticket. Send it to reception to confirm payment details.",
             tLblClient: "Guest:",
             tLblPhone: "Phone:",
             tLblEmail: "Email:",
@@ -850,145 +865,78 @@
             tLblTime: "Arrival Time:",
             tLblShuttle: "Airport Shuttle:",
             tLblTotal: "TOTAL PRICE:",
-            btnWhatsApp: "Send Ticket via WhatsApp",
-            btnEmail: "Send Ticket via Email",
+            btnWhatsApp: "Send ticket via WhatsApp",
+            btnEmail: "Send ticket via Email",
             rooftopModalTitle: "🍷 Rooftop Restaurant (6th Floor)",
-            rooftopModalDesc: "Located on the 6th floor terrace of Edmond Hotel, our panoramic restaurant offers refined cuisine crafted by our Chef. Discover homemade desserts, signature cocktails, and enjoy panoramic views of Brazzaville.",
+            rooftopModalDesc: "Located on the 6th floor rooftop of Edmond Hotel, enjoy fine dining, artisan desserts, signature cocktails, and a breathtaking view of Brazzaville.",
             myBookingsTitle: "My Saved Bookings",
-            footerAdvTitle: "Your Benefits at Edmond Group",
+            footerAdvTitle: "Your Benefits at Groupe Edmond",
             advRooftopTitle: "6th Floor Panoramic Restaurant",
-            advRooftopDesc: "Rooftop terrace overlooking Brazzaville & gourmet desserts.",
+            advRooftopDesc: "Rooftop terrace with Brazzaville views & chef-crafted desserts.",
             advParkTitle: "Private & Secure Parking",
-            advParkDesc: "Free parking for hotel guests.",
-            adv2Title: "Customer Support & WhatsApp 24/7",
-            adv2Desc: "Instant assistance with our reception desk.",
-            contactBoxTitle: "Edmond Group Reception"
+            advParkDesc: "Free parking for hotel residents.",
+            adv2Title: "24/7 Customer Service & WhatsApp",
+            adv2Desc: "Instant communication with our front desk team.",
+            contactBoxTitle: "Groupe Edmond Reception"
         }
     };
 
-    // BASE DE DONNÉES GÉRÉE POUR LES 100 CHAMBRES
-    const roomCatalogTemplates = [
-        {
-            type: "standard",
-            nameFR: "Chambre Standard Classique",
-            nameEN: "Classic Standard Room",
-            price: 35000,
-            tagFR: "💡 Meilleurs Tarifs",
-            tagEN: "💡 Best Value",
-            specsFR: "Lit Queen Size • Climatisation • Wi-Fi • TV HD",
-            specsEN: "Queen Size Bed • A/C • High-Speed Wi-Fi • HD TV",
-            compartments: [
-                { name: "Chambre", img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=300&q=80" },
-                { name: "Salle de Bain", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=300&q=80" }
-            ]
-        },
-        {
-            type: "standard",
-            nameFR: "Chambre Exécutive Confort",
-            nameEN: "Executive Comfort Room",
-            price: 50000,
-            tagFR: "✨ Vue Ville",
-            tagEN: "✨ City View",
-            specsFR: "Lit King Size • Espace de Travail • Mini Bar • Balcon Privé",
-            specsEN: "King Size Bed • Work Desk • Mini Bar • Private Balcony",
-            compartments: [
-                { name: "Espace Nuit", img: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=300&q=80" },
-                { name: "Balcon", img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=300&q=80" },
-                { name: "Douche Italienne", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=300&q=80" }
-            ]
-        },
-        {
-            type: "vip",
-            nameFR: "Suite VIP Prestige",
-            nameEN: "Prestige VIP Suite",
-            price: 85000,
-            tagFR: "👑 Service VIP inclus",
-            tagEN: "👑 VIP Service Included",
-            specsFR: "Grand Salon • Lit King Size • Petit Déjeuner Offert • Jacuzzi",
-            specsEN: "Living Room • King Size Bed • Free Breakfast • Jacuzzi",
-            compartments: [
-                { name: "Chambre Principale", img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=300&q=80" },
-                { name: "Salon VIP", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80" },
-                { name: "Bain Jacuzzi", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=300&q=80" }
-            ]
-        },
-        {
-            type: "vip",
-            nameFR: "Suite Présidentielle Panoramique",
-            nameEN: "Presidential Panoramic Suite",
-            price: 150000,
-            tagFR: "🌟 Vue Panoramique 360°",
-            tagEN: "🌟 360° Panoramic View",
-            specsFR: "Étage Élevé • Multi-Salons • Service Majordome • Rooftop Direct",
-            specsEN: "High Floor • Multi Living Rooms • Butler Service • Rooftop Access",
-            compartments: [
-                { name: "Master Suite", img: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=300&q=80" },
-                { name: "Grand Salon", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80" },
-                { name: "Terrasse Privée", img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=300&q=80" }
-            ]
-        },
-        {
-            type: "multi",
-            nameFR: "Appartement Familial (2 Chambres)",
-            nameEN: "Family Apartment (2 Bedrooms)",
-            price: 120000,
-            tagFR: "👨‍👩‍👧‍👦 Idéal Familles & Groupes",
-            tagEN: "👨‍👩‍👧‍👦 Ideal for Families & Groups",
-            specsFR: "2 Chambres Séparées • Cuisine Équipée • Salon Familial • 2 SDB",
-            specsEN: "2 Separate Bedrooms • Fitted Kitchen • Living Room • 2 Bathrooms",
-            compartments: [
-                { name: "Chambre 1", img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=300&q=80" },
-                { name: "Chambre 2", img: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=300&q=80" },
-                { name: "Séjour & Cuisine", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80" }
-            ]
-        }
-    ];
-
-    // GENERATEUR DE 100 CHAMBRES
-    const allRoomsList = [];
-    for (let i = 1; i <= 100; i++) {
-        const tpl = roomCatalogTemplates[(i - 1) % roomCatalogTemplates.length];
-        allRoomsList.push({
-            id: i,
-            number: 100 + i,
-            type: tpl.type,
-            nameFR: `${tpl.nameFR} N°${100 + i}`,
-            nameEN: `${tpl.nameEN} N°${100 + i}`,
-            price: tpl.price,
-            tagFR: tpl.tagFR,
-            tagEN: tpl.tagEN,
-            specsFR: tpl.specsFR,
-            specsEN: tpl.specsEN,
-            compartments: tpl.compartments
-        });
-    }
-
-    // LISTE DES PAYS
-    const countriesList = [
-        "République du Congo (Congo-Brazzaville)",
-        "République Démocratique du Congo (RDC)",
-        "France",
-        "Cameroun",
-        "Gabon",
-        "Côte d'Ivoire",
-        "Sénégal",
-        "Angola",
-        "États-Unis",
-        "Belgique",
-        "Canada",
-        "Autre"
-    ];
-
-    // INITIALISATION
-    window.addEventListener('DOMContentLoaded', () => {
-        setupDates();
+    /* INITIALISATION DE LA PAGE */
+    document.addEventListener("DOMContentLoaded", () => {
+        initDates();
         populateCountries();
+        allRooms = generate100RoomsData();
+        setupNavigation();
         setupDrawer();
-        renderRooms();
-        updateStepUI();
     });
 
-    function setupDates() {
+    /* GENERATEUR DES 100 CHAMBRES */
+    function generate100RoomsData() {
+        const rooms = [];
+        const roomCategories = [
+            { type: 'standard', title: 'Chambre Standard Classique', price: 45000, desc: 'Lit King Size, Climatisation, Wifi Fibre, TV HD, Salle de bain privée.' },
+            { type: 'vip', title: 'Suite VIP Executive & Vue Panoramique', price: 75000, desc: 'Lit XL, Salon Privé, Balcon vue Brazzaville, Minibar & Machine Nespresso.' },
+            { type: 'multi', title: 'Suite Familiale & Connectée (2+ Chambres)', price: 120000, desc: '2 Chambres communicantes, Grand Salon, 2 Salles de bains marbre, Service Majordome.' }
+        ];
+
+        const compartmentImgs = {
+            standard: [
+                'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=300&q=80',
+                'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=300&q=80',
+                'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=300&q=80'
+            ],
+            vip: [
+                'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=300&q=80',
+                'https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=300&q=80',
+                'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=300&q=80'
+            ],
+            multi: [
+                'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=300&q=80',
+                'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=300&q=80',
+                'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=300&q=80'
+            ]
+        };
+
+        for (let i = 1; i <= 100; i++) {
+            const catIdx = (i % 3 === 0) ? 2 : ((i % 2 === 0) ? 1 : 0);
+            const cat = roomCategories[catIdx];
+            const roomNum = 100 + i;
+
+            rooms.push({
+                id: i,
+                roomNumber: roomNum,
+                type: cat.type,
+                title: `${cat.title} N°${roomNum}`,
+                price: cat.price,
+                desc: cat.desc,
+                imgs: compartmentImgs[cat.type]
+            });
+        }
+        return rooms;
+    }
+
+    /* INITIALISATION ET PARSAGE DES DATES */
+    function initDates() {
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -997,36 +945,85 @@
         document.getElementById('checkout').value = tomorrow.toISOString().split('T')[0];
     }
 
+    /* PAYS D'AFRIQUE ET DU MONDE */
     function populateCountries() {
+        const countries = [
+            "République du Congo 🇨🇬",
+            "RDC (Congo-Kinshasa) 🇨🇩",
+            "France 🇫🇷",
+            "Cameroun 🇨🇲",
+            "Gabon 🇬🇦",
+            "Côte d'Ivoire 🇨🇮",
+            "Sénégal 🇸🇳",
+            "Tchad 🇹🇩",
+            "RCA 🇨🇫",
+            "Guinée Équatoriale 🇬🇶",
+            "Angola 🇦🇴",
+            "Belgique 🇧🇪",
+            "Canada 🇨🇦",
+            "États-Unis 🇺🇸",
+            "Autre Pays"
+        ];
         const select = document.getElementById('country');
-        select.innerHTML = '';
-        countriesList.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c;
-            opt.textContent = c;
-            select.appendChild(opt);
+        select.innerHTML = countries.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    /* NAVIGATION PAR FENÊTRES */
+    function goToStep(stepNum) {
+        currentStep = stepNum;
+        
+        document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(`step${stepNum}`).classList.add('active');
+
+        document.getElementById('stepIndicatorTitle').innerText = stepTitles[currentLang][stepNum];
+
+        document.getElementById('prevStepBtn').disabled = (stepNum === 1);
+        document.getElementById('nextStepBtn').disabled = (stepNum === 5);
+
+        if (stepNum === 3) {
+            updateSummaryBarText();
+            renderRooms();
+        } else if (stepNum === 5) {
+            generateTicket();
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setupNavigation() {
+        document.getElementById('prevStepBtn').addEventListener('click', () => {
+            if (currentStep > 1) goToStep(currentStep - 1);
+        });
+
+        document.getElementById('nextStepBtn').addEventListener('click', () => {
+            if (currentStep < 5) {
+                if (currentStep === 2) {
+                    goToStep(3);
+                } else if (currentStep === 3) {
+                    if (!selectedRoom) {
+                        alert(currentLang === 'FR' ? "Veuillez choisir une chambre pour continuer." : "Please select a room to continue.");
+                        return;
+                    }
+                    goToStep(4);
+                } else if (currentStep === 4) {
+                    submitStep4();
+                } else {
+                    goToStep(currentStep + 1);
+                }
+            }
         });
     }
 
-    // GESTION DU DRAWER
+    /* GESTION DRAWER MENU */
     function setupDrawer() {
-        const openBtn = document.getElementById('openDrawerBtn');
-        const closeBtn = document.getElementById('closeDrawerBtn');
-        const overlay = document.getElementById('drawerOverlay');
-        const drawer = document.getElementById('drawer');
+        document.getElementById('openDrawerBtn').addEventListener('click', openDrawer);
+        document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
+        document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+    }
 
-        openBtn.addEventListener('click', () => {
-            drawer.classList.add('active');
-            overlay.style.display = 'block';
-        });
-
-        const closeFn = () => {
-            drawer.classList.remove('active');
-            overlay.style.display = 'none';
-        };
-
-        closeBtn.addEventListener('click', closeFn);
-        overlay.addEventListener('click', closeFn);
+    function openDrawer() {
+        document.getElementById('drawer').classList.add('active');
+        document.getElementById('drawerOverlay').style.display = 'block';
     }
 
     function closeDrawer() {
@@ -1034,111 +1031,47 @@
         document.getElementById('drawerOverlay').style.display = 'none';
     }
 
-    // GESTION DU MULTILINGUE
+    /* TRADUCTION EN TEMPS RÉEL */
     function toggleLanguage() {
-        currentLang = currentLang === 'FR' ? 'EN' : 'FR';
-        document.getElementById('langToggleBtn').textContent = currentLang === 'FR' ? 'EN 🇺🇸' : 'FR 🇫🇷';
-        document.getElementById('currentLangLabel').textContent = currentLang;
+        currentLang = (currentLang === 'FR') ? 'EN' : 'FR';
+        document.getElementById('langToggleBtn').innerText = (currentLang === 'FR') ? 'EN 🇺🇸' : 'FR 🇫🇷';
+        document.getElementById('currentLangLabel').innerText = currentLang;
 
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (i18n[currentLang][key]) {
-                el.textContent = i18n[currentLang][key];
+                el.innerText = i18n[currentLang][key];
             }
         });
 
-        renderRooms();
-        if (selectedRoom) {
-            updateSummaryBar();
-        }
+        document.getElementById('stepIndicatorTitle').innerText = stepTitles[currentLang][currentStep];
+        if (currentStep === 3) renderRooms();
     }
 
-    // NAVIGATION PAR ÉTAPES
-    function goToStep(stepNumber) {
-        if (stepNumber < 1 || stepNumber > 5) return;
-
-        if (stepNumber > 2) {
-            const inDate = new Date(document.getElementById('checkin').value);
-            const outDate = new Date(document.getElementById('checkout').value);
-            if (outDate <= inDate) {
-                alert(currentLang === 'FR' ? "La date de départ doit être après la date d'arrivée." : "Check-out date must be after check-in date.");
-                return;
-            }
-        }
-
-        if (stepNumber === 4 && !selectedRoom) {
-            alert(currentLang === 'FR' ? "Veuillez d'abord sélectionner une chambre." : "Please select a room first.");
-            return;
-        }
-
-        if (stepNumber === 5) {
-            const firstname = document.getElementById('firstname').value.trim();
-            const lastname = document.getElementById('lastname').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const email = document.getElementById('email').value.trim();
-
-            if (!firstname || !lastname || !phone || !email) {
-                alert(currentLang === 'FR' ? "Veuillez remplir tous les champs obligatoires (*)." : "Please fill in all required fields (*).");
-                return;
-            }
-
-            generateTicketDetails();
-        }
-
-        currentStep = stepNumber;
-        document.querySelectorAll('.step-content').forEach((el, idx) => {
-            el.classList.toggle('active', idx + 1 === currentStep);
-        });
-
-        updateStepUI();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function changeStep(delta) {
-        goToStep(currentStep + delta);
-    }
-
-    function updateStepUI() {
-        const titlesFR = ["1. ACCUEIL", "2. DATES & OCCUPANTS", "3. CHOIX CHAMBRE", "4. COORDONNÉES", "5. TICKET DE RÉSERVATION"];
-        const titlesEN = ["1. HOME", "2. DATES & GUESTS", "3. ROOM SELECTION", "4. GUEST DETAILS", "5. BOOKING TICKET"];
-        
-        const titles = currentLang === 'FR' ? titlesFR : titlesEN;
-        document.getElementById('stepIndicatorTitle').textContent = titles[currentStep - 1];
-
-        document.getElementById('prevStepBtn').disabled = (currentStep === 1);
-        document.getElementById('nextStepBtn').disabled = (currentStep === 5);
-
-        if (currentStep === 3) {
-            updateSummaryBar();
-        }
-    }
-
-    function updateSummaryBar() {
+    /* MISE À JOUR DU RÉSUMÉ ÉTAPE 3 */
+    function updateSummaryBarText() {
         const checkin = document.getElementById('checkin').value;
         const checkout = document.getElementById('checkout').value;
         const rooms = document.getElementById('roomsCount').value;
         const adults = document.getElementById('adultsCount').value;
 
-        const text = currentLang === 'FR' 
-            ? `Du ${formatDate(checkin)} au ${formatDate(checkout)}<br>${rooms} chambre(s), ${adults} adulte(s)`
-            : `From ${formatDate(checkin)} to ${formatDate(checkout)}<br>${rooms} room(s), ${adults} adult(s)`;
-        
-        document.getElementById('summaryBarText').innerHTML = text;
+        const dateFormatted = `${formatDate(checkin)} au ${formatDate(checkout)}`;
+        document.getElementById('summaryBarText').innerHTML = `Du ${dateFormatted}<br>${rooms} chambre(s), ${adults} adulte(s)`;
     }
 
-    function formatDate(str) {
-        if (!str) return '';
-        const parts = str.split('-');
+    function formatDate(dateStr) {
+        if (!dateStr) return '--/--';
+        const parts = dateStr.split('-');
         return `${parts[2]}/${parts[1]}`;
     }
 
-    // FILTRAGE ET AFFICHAGE DES CHAMBRES
-    function setCategoryFilter(category, btnElement) {
-        currentCategoryFilter = category;
-        visibleRoomsLimit = 5;
+    /* FILTRES ET RENDU DES CHAMBRES */
+    function setCategoryFilter(category, btnEl) {
+        selectedCategory = category;
+        displayedRoomCount = 5;
 
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btnElement.classList.add('active');
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        if (btnEl) btnEl.classList.add('active');
 
         renderRooms();
     }
@@ -1147,43 +1080,49 @@
         const container = document.getElementById('roomsContainer');
         container.innerHTML = '';
 
-        let filtered = allRoomsList.filter(r => {
-            if (currentCategoryFilter === 'all') return true;
-            return r.type === currentCategoryFilter;
-        });
+        let filtered = allRooms;
+        if (selectedCategory !== 'all') {
+            filtered = allRooms.filter(r => r.type === selectedCategory);
+        }
 
-        const slice = filtered.slice(0, visibleRoomsLimit);
+        const visibleRooms = filtered.slice(0, displayedRoomCount);
 
-        slice.forEach(room => {
-            const roomName = currentLang === 'FR' ? room.nameFR : room.nameEN;
-            const tag = currentLang === 'FR' ? room.tagFR : room.tagEN;
-            const specs = currentLang === 'FR' ? room.specsFR : room.specsEN;
-
-            let compsHtml = '';
-            room.compartments.forEach(c => {
-                compsHtml += `
-                    <div class="compartment-box">
-                        <div class="compartment-img" style="background-image: url('${c.img}');"></div>
-                        <div class="compartment-name">${c.name}</div>
-                    </div>
-                `;
-            });
-
+        visibleRooms.forEach(room => {
+            const isSelected = selectedRoom && selectedRoom.id === room.id;
             const card = document.createElement('div');
             card.className = 'room-card';
+            card.style.border = isSelected ? '2px solid var(--primary-bordeaux)' : '1px solid var(--border-color)';
+
             card.innerHTML = `
-                <div class="smart-tag">${tag}</div>
-                <div class="compartments-strip">${compsHtml}</div>
+                <div class="smart-tag">
+                    ⭐ ${currentLang === 'FR' ? 'Inclus : Petit-déjeuner buffet + Wifi Fibre + Climatisation' : 'Included: Buffet Breakfast + Fiber Wifi + AC'}
+                </div>
+
+                <div class="compartments-strip">
+                    <div class="compartment-box">
+                        <div class="compartment-img" style="background-image: url('${room.imgs[0]}');"></div>
+                        <div class="compartment-name">${currentLang === 'FR' ? 'Chambre' : 'Room'}</div>
+                    </div>
+                    <div class="compartment-box">
+                        <div class="compartment-img" style="background-image: url('${room.imgs[1]}');"></div>
+                        <div class="compartment-name">${currentLang === 'FR' ? 'Salle de bain' : 'Bathroom'}</div>
+                    </div>
+                    <div class="compartment-box">
+                        <div class="compartment-img" style="background-image: url('${room.imgs[2]}');"></div>
+                        <div class="compartment-name">${currentLang === 'FR' ? 'Vue & Balcon' : 'View & Balcony'}</div>
+                    </div>
+                </div>
+
                 <div class="room-details">
                     <div class="room-header-flex">
-                        <div class="room-title">${roomName}</div>
+                        <div class="room-title">${room.title}</div>
                         <span class="room-badge-type">${room.type.toUpperCase()}</span>
                     </div>
-                    <div class="room-specs">${specs}</div>
+                    <p class="room-specs">${room.desc}</p>
                     <div class="room-price-row">
                         <div class="room-price">${room.price.toLocaleString('fr-FR')} FCFA <span>/ nuit</span></div>
-                        <button class="btn-primary" style="width: auto; padding: 8px 16px; margin: 0; font-size: 12px;" onclick="selectRoom(${room.id})">
-                            ${currentLang === 'FR' ? 'Sélectionner' : 'Select'}
+                        <button class="btn-primary" style="width: auto; padding: 8px 14px; font-size: 11px; margin: 0;" onclick="selectRoom(${room.id})">
+                            ${isSelected ? (currentLang === 'FR' ? '✓ Sélectionnée' : '✓ Selected') : (currentLang === 'FR' ? 'Réserver' : 'Book')}
                         </button>
                     </div>
                 </div>
@@ -1192,7 +1131,7 @@
         });
 
         const loadMoreBtn = document.getElementById('loadMoreBtn');
-        if (filtered.length > visibleRoomsLimit) {
+        if (filtered.length > displayedRoomCount) {
             loadMoreBtn.style.display = 'block';
         } else {
             loadMoreBtn.style.display = 'none';
@@ -1200,109 +1139,107 @@
     }
 
     function loadMoreRooms() {
-        visibleRoomsLimit += 5;
+        displayedRoomCount += 5;
         renderRooms();
     }
 
     function selectRoom(roomId) {
-        selectedRoom = allRoomsList.find(r => r.id === roomId);
+        selectedRoom = allRooms.find(r => r.id === roomId);
+        renderRooms();
         goToStep(4);
     }
 
-    // CALCUL DES PRIX ET ÉTAPE 4
-    function calculateNights() {
-        const inDate = new Date(document.getElementById('checkin').value);
-        const outDate = new Date(document.getElementById('checkout').value);
-        const diffTime = outDate - inDate;
-        const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return nights > 0 ? nights : 1;
+    /* CALCULE LE PRIX TOTAL ET VALIDE L'ÉTAPE 4 */
+    function submitStep4() {
+        const form = document.getElementById('step4Form');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        goToStep(5);
     }
 
-    function updateTotalPriceCalculation() {
-        if (!selectedRoom) return 0;
-        const nights = calculateNights();
-        const roomCount = parseInt(document.getElementById('roomsCount').value) || 1;
-        const shuttleChecked = document.getElementById('airportShuttle').checked;
-
-        let total = (selectedRoom.price * nights * roomCount);
-        if (shuttleChecked) total += 15000;
-
-        computedTotalPrice = total;
-        return total;
+    function getNightsCount() {
+        const checkin = new Date(document.getElementById('checkin').value);
+        const checkout = new Date(document.getElementById('checkout').value);
+        const diff = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+        return diff > 0 ? diff : 1;
     }
 
-    // GÉNÉRATION DU TICKET (ÉTAPE 5)
-    function generateTicketDetails() {
+    /* GÉNÉRATION DU TICKET */
+    function generateTicket() {
+        if (!selectedRoom) return;
+
+        const nights = getNightsCount();
+        const roomsCount = parseInt(document.getElementById('roomsCount').value) || 1;
+        const hasShuttle = document.getElementById('airportShuttle').checked;
+
+        const baseTotal = selectedRoom.price * nights * roomsCount;
+        const shuttleFee = hasShuttle ? 15000 : 0;
+        const grandTotal = baseTotal + shuttleFee;
+
+        const refNum = 'EDM-2026-' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('ticketRefNumber').innerText = 'RÉF : ' + refNum;
+
         const prefix = document.getElementById('prefix').value;
-        const firstname = document.getElementById('firstname').value.trim();
-        const lastname = document.getElementById('lastname').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const email = document.getElementById('email').value.trim();
+        const fname = document.getElementById('firstname').value;
+        const lname = document.getElementById('lastname').value;
+        const phone = document.getElementById('phone').value;
+        const email = document.getElementById('email').value;
         const country = document.getElementById('country').value;
-
         const checkin = document.getElementById('checkin').value;
         const checkout = document.getElementById('checkout').value;
-        const time = document.getElementById('checktime').value;
-        const roomsCount = document.getElementById('roomsCount').value;
-        const adultsCount = document.getElementById('adultsCount').value;
-        const shuttle = document.getElementById('airportShuttle').checked;
+        const checktime = document.getElementById('checktime').value;
 
-        const nights = calculateNights();
-        const total = updateTotalPriceCalculation();
+        document.getElementById('tClient').innerText = `${prefix} ${fname} ${lname}`;
+        document.getElementById('tPhone').innerText = phone;
+        document.getElementById('tEmail').innerText = email;
+        document.getElementById('tCountry').innerText = country;
+        document.getElementById('tRoomName').innerText = selectedRoom.title;
+        document.getElementById('tRoomsCount').innerText = `${roomsCount} chambre(s) (${nights} nuit(s))`;
+        document.getElementById('tDates').innerText = `Du ${formatDate(checkin)} au ${formatDate(checkout)}`;
+        document.getElementById('tTime').innerText = checktime;
+        document.getElementById('tAirport').innerText = hasShuttle ? 'Oui (+15 000 FCFA)' : 'Non';
+        document.getElementById('tTotalPrice').innerText = grandTotal.toLocaleString('fr-FR') + ' FCFA';
 
-        if (!currentRefNumber) {
-            currentRefNumber = `EDM-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-        }
-
-        document.getElementById('ticketRefNumber').textContent = `RÉF : ${currentRefNumber}`;
-        document.getElementById('tClient').textContent = `${prefix} ${firstname} ${lastname}`;
-        document.getElementById('tPhone').textContent = phone;
-        document.getElementById('tEmail').textContent = email;
-        document.getElementById('tCountry').textContent = country;
-
-        const roomName = currentLang === 'FR' ? selectedRoom.nameFR : selectedRoom.nameEN;
-        document.getElementById('tRoomName').textContent = roomName;
-        document.getElementById('tRoomsCount').textContent = `${roomsCount} chambre(s), ${adultsCount} ad. (${nights} nuit(s))`;
-        document.getElementById('tDates').textContent = `${formatDate(checkin)} au ${formatDate(checkout)}`;
-        document.getElementById('tTime').textContent = time;
-        document.getElementById('tAirport').textContent = shuttle ? (currentLang === 'FR' ? 'Oui (+15 000 FCFA)' : 'Yes (+15,000 FCFA)') : (currentLang === 'FR' ? 'Non' : 'No');
-        document.getElementById('tTotalPrice').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
-
-        saveBookingToLocalStorage({
-            ref: currentRefNumber,
-            client: `${prefix} ${firstname} ${lastname}`,
-            room: roomName,
-            dates: `${formatDate(checkin)} - ${formatDate(checkout)}`,
-            total: `${total.toLocaleString('fr-FR')} FCFA`
+        saveBookingToLocal({
+            ref: refNum,
+            client: `${prefix} ${fname} ${lname}`,
+            phone: phone,
+            room: selectedRoom.title,
+            dates: `Du ${formatDate(checkin)} au ${formatDate(checkout)}`,
+            total: grandTotal.toLocaleString('fr-FR') + ' FCFA'
         });
     }
 
-    // ENVOI WHATSAPP ET EMAIL
+    /* ENVOI DU TICKET WHATSAPP & EMAIL */
     function sendTicketViaWhatsApp() {
-        const client = document.getElementById('tClient').textContent;
-        const room = document.getElementById('tRoomName').textContent;
-        const dates = document.getElementById('tDates').textContent;
-        const total = document.getElementById('tTotalPrice').textContent;
+        const ref = document.getElementById('ticketRefNumber').innerText;
+        const client = document.getElementById('tClient').innerText;
+        const phone = document.getElementById('tPhone').innerText;
+        const room = document.getElementById('tRoomName').innerText;
+        const dates = document.getElementById('tDates').innerText;
+        const total = document.getElementById('tTotalPrice').innerText;
 
-        const message = `Bonjour Réception Edmond Hôtel,\nJe souhaite valider ma réservation :\n- RÉF : ${currentRefNumber}\n- Client : ${client}\n- Chambre : ${room}\n- Dates : ${dates}\n- Montant Total : ${total}\nMerci !`;
+        const msg = `Bonjour Réception Edmond Hôtel,\n\nJe souhaite valider ma réservation :\n\n📌 ${ref}\n👤 Client : ${client}\n📞 Tél : ${phone}\n🏨 Chambre : ${room}\n📅 Séjour : ${dates}\n💰 Prix Total : ${total}\n\nMerci de me confirmer la réservation !`;
 
-        const encodedMsg = encodeURIComponent(message);
-        window.open(`https://wa.me/242069669602?text=${encodedMsg}`, '_blank');
+        window.open(`https://wa.me/242069669602?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function sendTicketViaEmail() {
-        const client = document.getElementById('tClient').textContent;
-        const room = document.getElementById('tRoomName').textContent;
-        const dates = document.getElementById('tDates').textContent;
-        const total = document.getElementById('tTotalPrice').textContent;
+        const ref = document.getElementById('ticketRefNumber').innerText;
+        const client = document.getElementById('tClient').innerText;
+        const room = document.getElementById('tRoomName').innerText;
+        const dates = document.getElementById('tDates').innerText;
+        const total = document.getElementById('tTotalPrice').innerText;
 
-        const subject = encodeURIComponent(`Réservation Hôtel Edmond - RÉF: ${currentRefNumber}`);
-        const body = encodeURIComponent(`Bonjour,\n\nVoici le récapitulatif de ma réservation :\n\n- Référence : ${currentRefNumber}\n- Client : ${client}\n- Chambre : ${room}\n- Dates de séjour : ${dates}\n- Montant Total : ${total}\n\nMerci de confirmer ma réservation.`);
+        const subject = `Réservation Edmond Hôtel - ${ref} (${client})`;
+        const body = `Bonjour Réception Edmond Hôtel,\n\nVoici mon ticket de réservation :\n\n- ${ref}\n- Client : ${client}\n- Chambre : ${room}\n- Dates : ${dates}\n- Total : ${total}\n\nMerci de confirmer ma demande.`;
 
-        window.open(`mailto:officieledmondhotel@gmail.com?subject=${subject}&body=${body}`, '_blank');
+        window.open(`mailto:officieledmondhotel@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     }
 
-    // MODALES
+    /* MODALE ROOFTOP */
     function openRooftopModal() {
         closeDrawer();
         document.getElementById('rooftopModal').style.display = 'flex';
@@ -1312,42 +1249,37 @@
         document.getElementById('rooftopModal').style.display = 'none';
     }
 
+    /* STOCKAGE LOCAL DES RÉSERVATIONS */
+    function saveBookingToLocal(bookingObj) {
+        let bookings = JSON.parse(localStorage.getItem('edmond_bookings') || '[]');
+        bookings.unshift(bookingObj);
+        localStorage.setItem('edmond_bookings', JSON.stringify(bookings));
+    }
+
     function openMyBookingsModal() {
         closeDrawer();
-        renderMyBookingsList();
+        const listDiv = document.getElementById('myBookingsList');
+        const bookings = JSON.parse(localStorage.getItem('edmond_bookings') || '[]');
+
+        if (bookings.length === 0) {
+            listDiv.innerHTML = `<p style="font-size: 12px; color: var(--text-muted); text-align: center;">Aucune réservation enregistrée pour le moment.</p>`;
+        } else {
+            listDiv.innerHTML = bookings.map(b => `
+                <div style="border: 1px solid var(--border-color); padding: 10px; margin-bottom: 10px; border-radius: 6px; background: #faf8f5;">
+                    <div style="font-weight: bold; color: var(--primary-bordeaux); font-size: 12px;">${b.ref}</div>
+                    <div style="font-size: 11px;">👤 ${b.client} (${b.phone})</div>
+                    <div style="font-size: 11px;">🏨 ${b.room}</div>
+                    <div style="font-size: 11px;">📅 ${b.dates}</div>
+                    <div style="font-size: 12px; font-weight: bold; color: var(--primary-bordeaux); margin-top: 4px;">💰 ${b.total}</div>
+                </div>
+            `).join('');
+        }
+
         document.getElementById('myBookingsModal').style.display = 'flex';
     }
 
     function closeMyBookingsModal() {
         document.getElementById('myBookingsModal').style.display = 'none';
-    }
-
-    function saveBookingToLocalStorage(booking) {
-        let list = JSON.parse(localStorage.getItem('edmond_bookings') || '[]');
-        list.unshift(booking);
-        localStorage.setItem('edmond_bookings', JSON.stringify(list));
-    }
-
-    function renderMyBookingsList() {
-        const container = document.getElementById('myBookingsList');
-        let list = JSON.parse(localStorage.getItem('edmond_bookings') || '[]');
-
-        if (list.length === 0) {
-            container.innerHTML = `<p style="font-size: 12px; color: var(--text-muted); text-align: center;">${currentLang === 'FR' ? 'Aucune réservation enregistrée pour le moment.' : 'No saved bookings yet.'}</p>`;
-            return;
-        }
-
-        let html = '';
-        list.forEach(b => {
-            html += `
-                <div style="border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; background: #faf8f5;">
-                    <strong style="color: var(--primary-bordeaux);">${b.ref}</strong> - ${b.room}<br>
-                    <span style="color: var(--text-muted);">${b.client} | ${b.dates}</span><br>
-                    <strong style="color: var(--dark-color);">${b.total}</strong>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
     }
 </script>
 
