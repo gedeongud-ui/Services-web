@@ -275,6 +275,16 @@
             background: var(--primary-dark);
         }
 
+        .btn-secondary {
+            background: #fff;
+            color: var(--primary-bordeaux);
+            border: 1px solid var(--gold-accent);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gold-light);
+        }
+
         .btn-whatsapp { background: var(--whatsapp-color); color: #fff; border: none; }
         .btn-email { background: var(--email-color); color: #fff; border: none; }
 
@@ -302,7 +312,7 @@
             opacity: 0.95;
         }
 
-        /* FILTRES ET CARTES CHAMBRES */
+        /* FILTRES ET CARTES CHAMBRES & EXTRAS */
         .filter-tabs {
             display: flex;
             gap: 8px;
@@ -328,7 +338,7 @@
             border-color: var(--gold-accent);
         }
 
-        .room-card {
+        .item-card {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             background: #fff;
@@ -336,6 +346,10 @@
             margin-bottom: 22px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
             position: relative;
+        }
+        
+        .item-card.selected {
+            border: 2px solid var(--primary-bordeaux);
         }
 
         .smart-tag {
@@ -382,6 +396,14 @@
             color: var(--dark-color);
             background: #fff;
         }
+        
+        .extra-img {
+            width: 100%;
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            border-bottom: 1px solid var(--border-color);
+        }
 
         .room-details { padding: 14px; }
         .room-header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
@@ -401,6 +423,7 @@
         .ticket-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
         .ticket-label { color: var(--text-muted); font-weight: 500; }
         .ticket-value { font-weight: 700; color: var(--dark-color); text-align: right; }
+        .ticket-extras-list { font-size: 12px; color: var(--text-muted); margin-top: 5px; padding-left: 10px; border-left: 2px solid var(--gold-accent); }
         .ticket-total-row { border-top: 2px solid var(--dark-color); padding-top: 10px; margin-top: 12px; font-size: 16px; font-weight: 800; }
 
         /* MODALES */
@@ -546,10 +569,23 @@
         </button>
     </div>
 
-    <!-- ÉTAPE 4 : RENSEIGNEMENTS CLIENT -->
+    <!-- ÉTAPE 4 : NOUVELLE PAGE - RESTAURATION & ÉVÉNEMENTS -->
     <div class="step-content" id="step4">
-        <h2 data-i18n="step4Title">Renseignements Client</h2>
-        <form id="step4Form">
+        <h2 data-i18n="step4ExtrasTitle">Services & Événements</h2>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;" data-i18n="step4ExtrasDesc">
+            Sélectionnez les services additionnels dont vous souhaitez profiter. (Facultatif)
+        </p>
+        
+        <div id="extrasContainer"></div>
+
+        <button type="button" class="btn-primary" onclick="goToStep(5)" data-i18n="btnStep4Extras">Continuer vers les coordonnées</button>
+        <button type="button" class="btn-primary btn-secondary" onclick="goToStep(5)" data-i18n="btnSkipExtras">Passer cette étape</button>
+    </div>
+
+    <!-- ÉTAPE 5 : RENSEIGNEMENTS CLIENT -->
+    <div class="step-content" id="step5">
+        <h2 data-i18n="step5Title">Renseignements Client</h2>
+        <form id="step5Form">
             <div class="form-group">
                 <label for="prefix" data-i18n="lblCivility">Civilité *</label>
                 <select id="prefix" required>
@@ -594,14 +630,14 @@
                 </div>
             </div>
 
-            <button type="button" class="btn-primary" onclick="submitStep4()" data-i18n="btnStep4">Générer mon ticket de réservation</button>
+            <button type="button" class="btn-primary" onclick="submitStep5()" data-i18n="btnStep5">Générer mon ticket de réservation</button>
         </form>
     </div>
 
-    <!-- ÉTAPE 5 : TICKET -->
-    <div class="step-content" id="step5">
-        <h2 data-i18n="step5Title">Validation du Ticket</h2>
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;" data-i18n="step5Desc">
+    <!-- ÉTAPE 6 : TICKET -->
+    <div class="step-content" id="step6">
+        <h2 data-i18n="step6Title">Validation du Ticket</h2>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;" data-i18n="step6Desc">
             Voici votre ticket de réservation pour l'Edmond Hôtel. Transmettez-le à la réception pour finaliser les modalités de paiement.
         </p>
 
@@ -622,7 +658,13 @@
             <div class="ticket-row"><span class="ticket-label" data-i18n="tLblRoomsCount">Sélection :</span><span class="ticket-value" id="tRoomsCount">---</span></div>
             <div class="ticket-row"><span class="ticket-label" data-i18n="tLblPeriod">SÉJOUR :</span><span class="ticket-value" id="tDates">---</span></div>
             <div class="ticket-row"><span class="ticket-label" data-i18n="tLblTime">Heure Arrivée :</span><span class="ticket-value" id="tTime">---</span></div>
-            <div class="ticket-row"><span class="ticket-label" data-i18n="tLblShuttle">Navette Aéroport :</span><span class="ticket-value" id="tAirport">Non</span></div>
+            <div class="ticket-row"><span class="ticket-label" data-i18n="tLblShuttle">Navette :</span><span class="ticket-value" id="tAirport">Non</span></div>
+            
+            <!-- AFFICHAGE DES SERVICES ET EXTRAS SÉLECTIONNÉS -->
+            <div id="tExtrasSection" style="display: none; margin-top: 10px;">
+                <div class="ticket-row"><span class="ticket-label" data-i18n="tLblExtras">Extras & Événements :</span></div>
+                <div class="ticket-extras-list" id="tExtrasList"></div>
+            </div>
 
             <div class="ticket-row ticket-total-row">
                 <span data-i18n="tLblTotal">PRIX TOTAL :</span>
@@ -729,23 +771,35 @@
     let displayedRoomCount = 5;
     let selectedRoom = null;
     let allRooms = [];
+    let selectedExtras = []; // Pour stocker les services de l'étape 4
 
     const stepTitles = {
         FR: {
             1: "1. ACCUEIL",
             2: "2. DATES & OCCUPANTS",
             3: "3. CHOIX DE LA CHAMBRE",
-            4: "4. VOS COORDONNÉES",
-            5: "5. TICKET DE RÉSERVATION"
+            4: "4. RESTAURATION & LOISIRS",
+            5: "5. VOS COORDONNÉES",
+            6: "6. TICKET DE RÉSERVATION"
         },
         EN: {
             1: "1. HOME",
             2: "2. DATES & GUESTS",
             3: "3. ROOM SELECTION",
-            4: "4. YOUR DETAILS",
-            5: "5. BOOKING TICKET"
+            4: "4. DINING & EVENTS",
+            5: "5. YOUR DETAILS",
+            6: "6. BOOKING TICKET"
         }
     };
+    
+    /* DONNÉES SERVICES EXTRAS (BASÉ SUR L'IMAGE FOURNIE) */
+    const hotelExtras = [
+        { id: 'restau', titleFR: 'Restaurant & Terrasse (Buffets/Cocktails)', titleEN: 'Restaurant & Terrace (Buffets)', price: 15000, descFR: 'Service proposant des buffets, et terrasse pour des événements en soirée.', descEN: 'Buffet service and terrace for evening events.', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80' },
+        { id: 'cave', titleFR: 'Cave à vin', titleEN: 'Wine Cellar', price: 12000, descFR: 'Espace dédié aux amateurs de vin avec dégustation.', descEN: 'Space dedicated to wine lovers.', img: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=300&q=80' },
+        { id: 'salle', titleFR: 'Salles de réunion et fêtes', titleEN: 'Meeting & Party Rooms', price: 100000, descFR: 'Location d\'espaces pour vos réunions, séminaires ou réceptions.', descEN: 'Space rental for professional meetings or receptions.', img: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=300&q=80' },
+        { id: 'traiteur', titleFR: 'Service traiteur', titleEN: 'Catering Service', price: 50000, descFR: 'Offre clé en main pour accompagner les événements.', descEN: 'Turnkey catering offer for your events.', img: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=300&q=80' },
+        { id: 'boutique', titleFR: 'Boutique (Edmond Collection)', titleEN: 'Edmond Collection Shop', price: 0, descFR: 'Espace vestimentaire sur place (Achats facturés sur place).', descEN: 'On-site clothing store (Purchases billed on site).', img: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e07?auto=format&fit=crop&w=300&q=80' }
+    ];
 
     /* DICTIONNAIRE DE TRADUCTION BILINGUE FR / EN */
     const i18n = {
@@ -778,7 +832,13 @@
             filterVip: "VIP & Luxe",
             filterMulti: "2+ Chambres",
             btnLoadMore: "Afficher plus de chambres (+)",
-            step4Title: "Renseignements Client",
+            
+            step4ExtrasTitle: "Services & Événements",
+            step4ExtrasDesc: "Sélectionnez les services additionnels dont vous souhaitez profiter. (Facultatif)",
+            btnStep4Extras: "Continuer vers les coordonnées",
+            btnSkipExtras: "Passer cette étape",
+            
+            step5Title: "Renseignements Client",
             lblCivility: "Civilité *",
             lblFirstName: "Prénom *",
             lblLastName: "Nom de famille *",
@@ -787,9 +847,9 @@
             lblCountry: "Pays de résidence *",
             shuttleTitle: "🚙 Navette / Transfert Aéroport Maya-Maya (+15 000 FCFA)",
             shuttleDesc: "Prise en charge personnalisée à votre arrivée à l'aéroport de Brazzaville.",
-            btnStep4: "Générer mon ticket de réservation",
-            step5Title: "Validation du Ticket",
-            step5Desc: "Voici votre ticket de réservation pour l'Edmond Hôtel. Transmettez-le à la réception pour finaliser les modalités de paiement.",
+            btnStep5: "Générer mon ticket de réservation",
+            step6Title: "Validation du Ticket",
+            step6Desc: "Voici votre ticket de réservation pour l'Edmond Hôtel. Transmettez-le à la réception pour finaliser les modalités de paiement.",
             tLblClient: "Client :",
             tLblPhone: "Téléphone :",
             tLblEmail: "Email :",
@@ -799,6 +859,7 @@
             tLblPeriod: "SÉJOUR :",
             tLblTime: "Heure Arrivée :",
             tLblShuttle: "Navette Aéroport :",
+            tLblExtras: "Extras & Événements :",
             tLblTotal: "PRIX TOTAL :",
             btnWhatsApp: "Envoyer le ticket par WhatsApp",
             btnEmail: "Envoyer le ticket par Email",
@@ -843,7 +904,13 @@
             filterVip: "VIP & Luxury",
             filterMulti: "2+ Rooms",
             btnLoadMore: "Load more rooms (+)",
-            step4Title: "Guest Information",
+            
+            step4ExtrasTitle: "Dining & Events",
+            step4ExtrasDesc: "Select the additional services you wish to enjoy. (Optional)",
+            btnStep4Extras: "Continue to your details",
+            btnSkipExtras: "Skip this step",
+            
+            step5Title: "Guest Information",
             lblCivility: "Title *",
             lblFirstName: "First Name *",
             lblLastName: "Last Name *",
@@ -852,9 +919,9 @@
             lblCountry: "Country of Residence *",
             shuttleTitle: "🚙 Maya-Maya Airport Shuttle (+15,000 FCFA)",
             shuttleDesc: "Personalized pick-up service upon your arrival at Maya-Maya Airport.",
-            btnStep4: "Generate my booking ticket",
-            step5Title: "Ticket Confirmation",
-            step5Desc: "Here is your booking ticket. Send it to reception to confirm payment details.",
+            btnStep5: "Generate my booking ticket",
+            step6Title: "Ticket Confirmation",
+            step6Desc: "Here is your booking ticket. Send it to reception to confirm payment details.",
             tLblClient: "Guest:",
             tLblPhone: "Phone:",
             tLblEmail: "Email:",
@@ -864,6 +931,7 @@
             tLblPeriod: "STAY:",
             tLblTime: "Arrival Time:",
             tLblShuttle: "Airport Shuttle:",
+            tLblExtras: "Extras & Events:",
             tLblTotal: "TOTAL PRICE:",
             btnWhatsApp: "Send ticket via WhatsApp",
             btnEmail: "Send ticket via Email",
@@ -888,6 +956,7 @@
         allRooms = generate100RoomsData();
         setupNavigation();
         setupDrawer();
+        renderExtras();
     });
 
     /* GENERATEUR DES 100 CHAMBRES */
@@ -935,6 +1004,47 @@
         return rooms;
     }
 
+    /* RENDU DE LA PAGE 4 : SERVICES EXTRAS */
+    function renderExtras() {
+        const container = document.getElementById('extrasContainer');
+        container.innerHTML = '';
+
+        hotelExtras.forEach(extra => {
+            const isSelected = selectedExtras.includes(extra.id);
+            const card = document.createElement('div');
+            card.className = `item-card ${isSelected ? 'selected' : ''}`;
+            
+            const title = currentLang === 'FR' ? extra.titleFR : extra.titleEN;
+            const desc = currentLang === 'FR' ? extra.descFR : extra.descEN;
+            const priceText = extra.price > 0 ? `${extra.price.toLocaleString('fr-FR')} FCFA` : (currentLang === 'FR' ? 'Sur place' : 'On site');
+            const btnText = isSelected ? (currentLang === 'FR' ? '✓ Sélectionné' : '✓ Selected') : (currentLang === 'FR' ? '+ Ajouter' : '+ Add');
+
+            card.innerHTML = `
+                <div class="extra-img" style="background-image: url('${extra.img}');"></div>
+                <div class="room-details">
+                    <div class="room-title">${title}</div>
+                    <p class="room-specs" style="margin-top: 5px;">${desc}</p>
+                    <div class="room-price-row">
+                        <div class="room-price">${priceText}</div>
+                        <button type="button" class="btn-primary" style="width: auto; padding: 8px 14px; font-size: 11px; margin: 0; ${isSelected ? 'background: var(--gold-accent); color: var(--primary-dark);' : ''}" onclick="toggleExtra('${extra.id}')">
+                            ${btnText}
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function toggleExtra(extraId) {
+        if (selectedExtras.includes(extraId)) {
+            selectedExtras = selectedExtras.filter(id => id !== extraId);
+        } else {
+            selectedExtras.push(extraId);
+        }
+        renderExtras();
+    }
+
     /* INITIALISATION ET PARSAGE DES DATES */
     function initDates() {
         const today = new Date();
@@ -978,12 +1088,14 @@
         document.getElementById('stepIndicatorTitle').innerText = stepTitles[currentLang][stepNum];
 
         document.getElementById('prevStepBtn').disabled = (stepNum === 1);
-        document.getElementById('nextStepBtn').disabled = (stepNum === 5);
+        document.getElementById('nextStepBtn').disabled = (stepNum === 6);
 
         if (stepNum === 3) {
             updateSummaryBarText();
             renderRooms();
-        } else if (stepNum === 5) {
+        } else if (stepNum === 4) {
+            renderExtras();
+        } else if (stepNum === 6) {
             generateTicket();
         }
 
@@ -996,7 +1108,7 @@
         });
 
         document.getElementById('nextStepBtn').addEventListener('click', () => {
-            if (currentStep < 5) {
+            if (currentStep < 6) {
                 if (currentStep === 2) {
                     goToStep(3);
                 } else if (currentStep === 3) {
@@ -1006,7 +1118,9 @@
                     }
                     goToStep(4);
                 } else if (currentStep === 4) {
-                    submitStep4();
+                    goToStep(5);
+                } else if (currentStep === 5) {
+                    submitStep5();
                 } else {
                     goToStep(currentStep + 1);
                 }
@@ -1045,7 +1159,9 @@
         });
 
         document.getElementById('stepIndicatorTitle').innerText = stepTitles[currentLang][currentStep];
+        
         if (currentStep === 3) renderRooms();
+        if (currentStep === 4) renderExtras();
     }
 
     /* MISE À JOUR DU RÉSUMÉ ÉTAPE 3 */
@@ -1090,8 +1206,7 @@
         visibleRooms.forEach(room => {
             const isSelected = selectedRoom && selectedRoom.id === room.id;
             const card = document.createElement('div');
-            card.className = 'room-card';
-            card.style.border = isSelected ? '2px solid var(--primary-bordeaux)' : '1px solid var(--border-color)';
+            card.className = `room-card ${isSelected ? 'selected' : ''}`;
 
             card.innerHTML = `
                 <div class="smart-tag">
@@ -1121,7 +1236,7 @@
                     <p class="room-specs">${room.desc}</p>
                     <div class="room-price-row">
                         <div class="room-price">${room.price.toLocaleString('fr-FR')} FCFA <span>/ nuit</span></div>
-                        <button class="btn-primary" style="width: auto; padding: 8px 14px; font-size: 11px; margin: 0;" onclick="selectRoom(${room.id})">
+                        <button type="button" class="btn-primary" style="width: auto; padding: 8px 14px; font-size: 11px; margin: 0;" onclick="selectRoom(${room.id})">
                             ${isSelected ? (currentLang === 'FR' ? '✓ Sélectionnée' : '✓ Selected') : (currentLang === 'FR' ? 'Réserver' : 'Book')}
                         </button>
                     </div>
@@ -1149,14 +1264,14 @@
         goToStep(4);
     }
 
-    /* CALCULE LE PRIX TOTAL ET VALIDE L'ÉTAPE 4 */
-    function submitStep4() {
-        const form = document.getElementById('step4Form');
+    /* CALCULE LE PRIX TOTAL ET VALIDE L'ÉTAPE 5 */
+    function submitStep5() {
+        const form = document.getElementById('step5Form');
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
-        goToStep(5);
+        goToStep(6);
     }
 
     function getNightsCount() {
@@ -1174,9 +1289,33 @@
         const roomsCount = parseInt(document.getElementById('roomsCount').value) || 1;
         const hasShuttle = document.getElementById('airportShuttle').checked;
 
+        // Calcul Chambre
         const baseTotal = selectedRoom.price * nights * roomsCount;
+        
+        // Calcul Navette
         const shuttleFee = hasShuttle ? 15000 : 0;
-        const grandTotal = baseTotal + shuttleFee;
+        
+        // Calcul Extras
+        let extrasTotal = 0;
+        const tExtrasList = document.getElementById('tExtrasList');
+        tExtrasList.innerHTML = '';
+        
+        if(selectedExtras.length > 0) {
+            document.getElementById('tExtrasSection').style.display = 'block';
+            selectedExtras.forEach(extraId => {
+                const item = hotelExtras.find(e => e.id === extraId);
+                extrasTotal += item.price;
+                const pText = item.price > 0 ? `+${item.price.toLocaleString('fr-FR')} FCFA` : (currentLang === 'FR' ? 'Sur place' : 'On site');
+                tExtrasList.innerHTML += `<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span>- ${currentLang === 'FR' ? item.titleFR : item.titleEN}</span>
+                    <span style="font-weight: bold; color: var(--primary-bordeaux);">${pText}</span>
+                </div>`;
+            });
+        } else {
+            document.getElementById('tExtrasSection').style.display = 'none';
+        }
+
+        const grandTotal = baseTotal + shuttleFee + extrasTotal;
 
         const refNum = 'EDM-2026-' + Math.floor(1000 + Math.random() * 9000);
         document.getElementById('ticketRefNumber').innerText = 'RÉF : ' + refNum;
@@ -1220,8 +1359,16 @@
         const room = document.getElementById('tRoomName').innerText;
         const dates = document.getElementById('tDates').innerText;
         const total = document.getElementById('tTotalPrice').innerText;
+        
+        let extrasStr = '';
+        if(selectedExtras.length > 0) {
+            extrasStr = '\n🎁 Extras : ' + selectedExtras.map(id => {
+                const ex = hotelExtras.find(e => e.id === id);
+                return (currentLang === 'FR' ? ex.titleFR : ex.titleEN);
+            }).join(', ');
+        }
 
-        const msg = `Bonjour Réception Edmond Hôtel,\n\nJe souhaite valider ma réservation :\n\n📌 ${ref}\n👤 Client : ${client}\n📞 Tél : ${phone}\n🏨 Chambre : ${room}\n📅 Séjour : ${dates}\n💰 Prix Total : ${total}\n\nMerci de me confirmer la réservation !`;
+        const msg = `Bonjour Réception Edmond Hôtel,\n\nJe souhaite valider ma réservation :\n\n📌 ${ref}\n👤 Client : ${client}\n📞 Tél : ${phone}\n🏨 Chambre : ${room}${extrasStr}\n📅 Séjour : ${dates}\n💰 Prix Total : ${total}\n\nMerci de me confirmer la réservation !`;
 
         window.open(`https://wa.me/242050447163?text=${encodeURIComponent(msg)}`, '_blank');
     }
