@@ -696,11 +696,11 @@ Prise en charge personnalisée à votre arrivée à l'aéroport de Brazzaville.
 </form>
 </div>
 
-<!-- ÉTAPE 6 : TICKET ET PAIEMENT USSD AUTOMATIQUE -->
+<!-- ÉTAPE 6 : TICKET ET PAIEMENT OPTION 2 USSD PUSH (DÉMO) -->
 <div class="step-content" id="step6">
 <h2 data-i18n="step6Title">Validation & Paiement</h2>
 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;" data-i18n="step6Desc">
-Voici votre ticket de réservation pour l'Edmond Hôtel. Effectuez le règlement par Mobile Money via les boutons ci-dessous, puis validez votre réservation.
+Voici votre ticket de réservation pour l'Edmond Hôtel. Saisissez votre numéro Mobile Money pour recevoir la notification instantanée de débit sur votre écran.
 </p>
 
 <div class="ticket-card" id="ticketPreview">
@@ -739,34 +739,65 @@ Voici votre ticket de réservation pour l'Edmond Hôtel. Effectuez le règlement
 </div>
 </div>
 
-<!-- BLOC PAIEMENT USSD AUTOMATIQUE -->
+<!-- BLOC PAIEMENT USSD PUSH AUTOMATIQUE (OPTION 2 DÉMO) -->
 <div style="background: var(--gold-light); border: 1px solid var(--gold-accent); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-  <h3 style="font-size: 14px; color: var(--primary-bordeaux); margin-bottom: 6px;">⚡ Paiement Instantané Mobile Money</h3>
+  <h3 style="font-size: 14px; color: var(--primary-bordeaux); margin-bottom: 6px;">📲 PAIEMENT AUTOMATIQUE USSD PUSH</h3>
   <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-    Cliquez sur votre opérateur pour ouvrir le clavier d'appel avec le code de transfert et le montant exact pré-composés :
+    Entrez votre numéro pour recevoir l'invite de débit instantanée sur votre téléphone :
   </p>
   
-  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
-    <button type="button" class="btn-primary" style="background: #d97706; border: none; margin: 0;" onclick="payerViaUSSD('MTN')">
-      🟡 Payer par MTN Mobile Money (*105#)
-    </button>
-    <button type="button" class="btn-primary" style="background: #dc2626; border: none; margin: 0;" onclick="payerViaUSSD('AIRTEL')">
-      🔴 Payer par Airtel Money (*128#)
-    </button>
+  <div class="form-group">
+    <label for="momoOperatorSelect" style="font-size: 11px; font-weight: 700; color: var(--primary-bordeaux);">Choix du réseau :</label>
+    <select id="momoOperatorSelect" style="padding: 10px; font-size: 13px; font-weight: bold;">
+      <option value="MTN Mobile Money (MTN MoMo)">🟡 MTN Mobile Money Congo (*105#)</option>
+      <option value="Airtel Money">🔴 Airtel Money Congo (*128#)</option>
+    </select>
   </div>
 
-  <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px; line-height: 1.4;">
-    💡 <i>Une fois le paiement validé sur votre téléphone, appuyez sur le bouton vert ci-dessous pour transmettre votre ticket à la réception.</i>
-  </p>
+  <div class="form-group">
+    <label for="momoPhoneNumberInput" style="font-size: 11px; font-weight: 700; color: var(--primary-bordeaux);">Numéro de téléphone du compte :</label>
+    <input type="tel" id="momoPhoneNumberInput" placeholder="Ex: 061234567 ou 051234567" maxlength="9" style="padding: 10px; font-size: 14px; font-weight: bold; letter-spacing: 1px;">
+  </div>
+
+  <button type="button" class="btn-primary" style="background: var(--primary-bordeaux); border: 1px solid var(--gold-accent); color: #fff;" onclick="lancerUssdPushDemo()">
+    ⚡ Lancer le paiement (USSD Push)
+  </button>
 </div>
 
-<button class="btn-primary btn-whatsapp" onclick="sendTicketViaWhatsApp()">
+<!-- BADGE DE STATUT DU PAIEMENT -->
+<div id="paymentStatusBadge" style="display: none; padding: 12px; border-radius: 6px; text-align: center; font-size: 12px; font-weight: bold; margin-bottom: 15px;"></div>
+
+<button class="btn-primary btn-whatsapp" id="btnWhatsAppConfirm" onclick="sendTicketViaWhatsApp()" style="opacity: 0.6; pointer-events: none;">
 <span>📱</span> <span data-i18n="btnWhatsApp">Confirmer ma réservation sur WhatsApp</span>
 </button>
 
 <button class="btn-primary btn-email" style="margin-top: 10px;" onclick="sendTicketViaEmail()">
 <span>✉️</span> <span data-i18n="btnEmail">Envoyer le ticket par Email</span>
 </button>
+</div>
+
+<!-- MODALE SIMULATION USSD PUSH POP-UP (RÉSEAU OPERATEUR) -->
+<div class="modal-overlay" id="ussdPushModal" style="display: none; z-index: 400;">
+  <div class="modal-card" style="text-align: center; background: #111; color: #fff; border: 2px solid var(--gold-accent);">
+    <div style="font-size: 40px; margin-bottom: 10px;">📲</div>
+    <h3 style="color: var(--gold-accent); font-size: 16px; margin-bottom: 8px;">NOTIFICATION POP-UP USSD</h3>
+    <p style="font-size: 13px; line-height: 1.5; color: #ddd; margin-bottom: 15px;" id="ussdModalMessage">
+      Demande de paiement envoyée sur votre téléphone...
+    </p>
+
+    <!-- SIMULATION ENTRÉE CODE PIN SECRET -->
+    <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+      <label style="color: #bbb; font-size: 11px; display: block; margin-bottom: 6px;">[DÉMO API] Entrez votre code PIN secret :</label>
+      <input type="password" id="simulatedPinInput" placeholder="••••" maxlength="4" style="text-align: center; font-size: 18px; letter-spacing: 5px; width: 120px; padding: 6px; background: #222; color: #fff; border: 1px solid var(--gold-accent);">
+    </div>
+
+    <button type="button" class="btn-primary" style="background: #25D366; color: #000; border: none; font-weight: 800;" onclick="validerPaiementUssdDemo()">
+      ✓ Valider le paiement
+    </button>
+    <button type="button" class="btn-primary btn-secondary" style="margin-top: 8px; border: none; background: transparent; color: #ff8888;" onclick="fermerUssdModal()">
+      Annuler
+    </button>
+  </div>
 </div>
 
 <!-- MODALE RESTAURANT & ROOFTOP -->
@@ -867,6 +898,8 @@ let displayedRoomCount = 5;
 let selectedRooms = []; // Choix multiple
 let allRooms = [];
 let selectedExtras = []; // Pour stocker les services de l'étape 4
+let transactionStatusConfirmed = false;
+let generatedTxId = "";
 
 const stepTitles = {
   FR: {
@@ -942,7 +975,7 @@ const i18n = {
     shuttleDesc: "Prise en charge personnalisée à votre arrivée à l'aéroport de Brazzaville.",
     btnStep5: "Générer mon ticket de réservation",
     step6Title: "Validation & Paiement",
-    step6Desc: "Voici votre ticket de réservation pour l'Edmond Hôtel. Effectuez le règlement par Mobile Money via les boutons ci-dessous, puis validez votre réservation.",
+    step6Desc: "Voici votre ticket de réservation pour l'Edmond Hôtel. Saisissez votre numéro Mobile Money pour recevoir la notification instantanée de débit sur votre écran.",
     tLblClient: "Client :",
     tLblPhone: "Téléphone :",
     tLblEmail: "Email :",
@@ -1012,7 +1045,7 @@ const i18n = {
     shuttleDesc: "Personalized pick-up service upon your arrival at Maya-Maya Airport.",
     btnStep5: "Generate my booking ticket",
     step6Title: "Validation & Payment",
-    step6Desc: "Here is your booking ticket. Complete payment using the buttons below, then send your confirmation to reception.",
+    step6Desc: "Here is your booking ticket. Enter your Mobile Money number to receive the instant payment prompt on your phone screen.",
     tLblClient: "Guest:",
     tLblPhone: "Phone:",
     tLblEmail: "Email:",
@@ -1216,6 +1249,9 @@ function goToStep(stepNum) {
     renderExtras();
   } else if (stepNum === 6) {
     generateTicket();
+    // Pré-remplir le numéro du formulaire client
+    const userPhone = document.getElementById('phone').value;
+    if (userPhone) document.getElementById('momoPhoneNumberInput').value = userPhone;
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1484,36 +1520,70 @@ function generateTicket() {
   });
 }
 
-/* OPTION 1 : DÉCLENCHEMENT DU CLAVIER DE TRANSFERT USSD PRÉ-REMPLI */
-function payerViaUSSD(operateur) {
+/* OPTION 2 : SIMULATION DU PAIEMENT USSD PUSH AUTOMATIQUE (DÉMO / SANDBOX API) */
+function lancerUssdPushDemo() {
+  const phoneInput = document.getElementById('momoPhoneNumberInput').value.trim();
+  const operatorSelect = document.getElementById('momoOperatorSelect').value;
   const rawPrice = document.getElementById('tTotalPrice').innerText;
   const montant = parseInt(rawPrice.replace(/\D/g, ''), 10);
 
-  if (!montant || montant <= 0) {
-    alert("Veuillez sélectionner au moins une chambre ou un service.");
+  if (!phoneInput || phoneInput.length < 9) {
+    alert("Veuillez saisir un numéro de téléphone valide (9 chiffres).");
     return;
   }
 
-  let codeUSSD = "";
-
-  if (operateur === 'MTN') {
-    // Numéro MTN officiel de réception
-    const numeroMTN = "060000000"; 
-    // Syntaxe de transfert MTN Congo (*105*2*1*NUMERO*MONTANT#)
-    codeUSSD = `*105*2*1*${numeroMTN}*${montant}%23`;
-  } else if (operateur === 'AIRTEL') {
-    // Numéro Airtel officiel de réception
-    const numeroAirtel = "050447163"; 
-    // Syntaxe de transfert Airtel Congo (*128*1*1*NUMERO*MONTANT#)
-    codeUSSD = `*128*1*1*${numeroAirtel}*${montant}%23`;
+  if (!montant || montant <= 0) {
+    alert("Montant invalide pour la réservation.");
+    return;
   }
 
-  // Ouvre le clavier d'appel pré-rempli avec le code et le montant exact
-  window.location.href = `tel:${codeUSSD}`;
+  // Affichage de la modale de notification d'envoi réseau
+  const modalMsg = `Demande de débit envoyée au numéro <strong>+242 ${phoneInput}</strong> (${operatorSelect}).<br><br>Montant à débiter : <strong>${montant.toLocaleString('fr-FR')} FCFA</strong>.<br><br>Veuillez entrer votre code PIN sur l'écran ci-dessous :`;
+  document.getElementById('ussdModalMessage').innerHTML = modalMsg;
+  document.getElementById('simulatedPinInput').value = '';
+  document.getElementById('ussdPushModal').style.display = 'flex';
+}
+
+function validerPaiementUssdDemo() {
+  const pin = document.getElementById('simulatedPinInput').value.trim();
+  if (pin.length < 4) {
+    alert("Veuillez entrer un code PIN à 4 chiffres.");
+    return;
+  }
+
+  // Simulation de la génération de l'ID de transaction
+  generatedTxId = 'TXN-' + Math.floor(100000000 + Math.random() * 900000000);
+  transactionStatusConfirmed = true;
+
+  fermerUssdModal();
+
+  // Mise à jour de l'affichage du statut sur le site
+  const badge = document.getElementById('paymentStatusBadge');
+  badge.style.display = 'block';
+  badge.style.background = '#d1fae5';
+  badge.style.color = '#065f46';
+  badge.style.border = '1px solid #10b981';
+  badge.innerHTML = `✅ PAIEMENT ACCEPTÉ PAR L'OPÉRATEUR !<br><span style="font-size: 11px;">Réf Transaction : ${generatedTxId}</span>`;
+
+  // Activation du bouton WhatsApp
+  const btnWA = document.getElementById('btnWhatsAppConfirm');
+  btnWA.style.opacity = '1';
+  btnWA.style.pointerEvents = 'auto';
+
+  alert("Paiement validé avec succès ! Cliquez maintenant sur le bouton WhatsApp pour transmettre votre réservation.");
+}
+
+function fermerUssdModal() {
+  document.getElementById('ussdPushModal').style.display = 'none';
 }
 
 /* ENVOI DU TICKET CONFIRMÉ SUR WHATSAPP & EMAIL */
 function sendTicketViaWhatsApp() {
+  if (!transactionStatusConfirmed) {
+    alert("Veuillez d'abord valider votre paiement USSD Push.");
+    return;
+  }
+
   const ref = document.getElementById('ticketRefNumber').innerText;
   const client = document.getElementById('tClient').innerText;
   const phone = document.getElementById('tPhone').innerText;
@@ -1531,7 +1601,7 @@ function sendTicketViaWhatsApp() {
 
   const promoStr = (document.getElementById('promoCode').value.trim().toLowerCase() === 'edmonhbrazza') ? '\n🎁 Code Promo : EdmonHbrazza (-10%)' : '';
 
-  const msg = `Bonjour Réception Edmond Hôtel,\n\nJe confirme ma réservation suite à mon paiement Mobile Money :\n\n📌 ${ref}\n👤 Client : ${client}\n📞 Tél : ${phone}\n🏨 Chambre(s) : ${room}${extrasStr}${promoStr}\n📅 Séjour : ${dates}\n💰 Prix Total : ${total}\n\nMerci de me confirmer la réception de ma demande !`;
+  const msg = `Bonjour Réception Edmond Hôtel,\n\nJe confirme ma réservation suite au paiement USSD Push en ligne :\n\n📌 ${ref}\n👤 Client : ${client}\n📞 Tél : ${phone}\n🏨 Chambre(s) : ${room}${extrasStr}${promoStr}\n📅 Séjour : ${dates}\n💰 Prix Total : ${total}\n💳 Réf Transaction USSD : ${generatedTxId}\n\nMerci de confirmer la réception de ma réservation !`;
 
   window.open(`https://wa.me/242050447163?text=${encodeURIComponent(msg)}`, '_blank');
 }
@@ -1544,7 +1614,7 @@ function sendTicketViaEmail() {
   const total = document.getElementById('tTotalPrice').innerText;
 
   const subject = `Réservation Edmond Hôtel - ${ref} (${client})`;
-  const body = `Bonjour Réception Edmond Hôtel,\n\nVoici mon ticket de réservation :\n\n- ${ref}\n- Client : ${client}\n- Chambre(s) : ${room}\n- Dates : ${dates}\n- Total : ${total}\n\nMerci de confirmer ma demande.`;
+  const body = `Bonjour Réception Edmond Hôtel,\n\nVoici mon ticket de réservation :\n\n- ${ref}\n- Client : ${client}\n- Chambre(s) : ${room}\n- Dates : ${dates}\n- Total : ${total}\n- Réf Transaction USSD : ${generatedTxId || 'Non validé'}\n\nMerci de confirmer ma demande.`;
 
   window.open(`mailto:officieledmondhotel@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
 }
