@@ -696,11 +696,11 @@ Prise en charge personnalisée à votre arrivée à l'aéroport de Brazzaville.
 </form>
 </div>
 
-<!-- ÉTAPE 6 : TICKET -->
+<!-- ÉTAPE 6 : TICKET ET PAIEMENT MOBILE MONEY -->
 <div class="step-content" id="step6">
-<h2 data-i18n="step6Title">Validation du Ticket</h2>
+<h2 data-i18n="step6Title">Validation & Paiement</h2>
 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;" data-i18n="step6Desc">
-Voici votre ticket de réservation pour l'Edmond Hôtel. Transmettez-le à la réception pour finaliser les modalités de paiement.
+Voici votre ticket de réservation pour l'Edmond Hôtel. Effectuez le règlement par Mobile Money puis validez en envoyant votre ticket à la réception.
 </p>
 
 <div class="ticket-card" id="ticketPreview">
@@ -739,8 +739,32 @@ Voici votre ticket de réservation pour l'Edmond Hôtel. Transmettez-le à la r�
 </div>
 </div>
 
+<!-- BLOC PAIEMENT MOBILE MONEY DIRECT -->
+<div style="background: var(--gold-light); border: 1px solid var(--gold-accent); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+  <h3 style="font-size: 14px; color: var(--primary-bordeaux); margin-bottom: 8px;">💳 Règlement par Mobile Money</h3>
+  <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+    Veuillez effectuer le transfert du montant total indiqué sur le ticket vers l'un des numéros ci-dessous :
+  </p>
+  
+  <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 130px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+      <strong style="color: #d97706; font-size: 12px;">🟡 MTN Mobile Money</strong><br>
+      <span style="font-size: 13px; font-weight: bold; color: var(--dark-color);">+242 06 000 00 00</span>
+    </div>
+    <div style="flex: 1; min-width: 130px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+      <strong style="color: #dc2626; font-size: 12px;">🔴 Airtel Money</strong><br>
+      <span style="font-size: 13px; font-weight: bold; color: var(--dark-color);">+242 05 044 71 63</span>
+    </div>
+  </div>
+
+  <div class="form-group" style="margin-bottom: 0;">
+    <label for="momoTxId" style="font-size: 11px; font-weight: 700; color: var(--primary-bordeaux); margin-bottom: 5px;">ID / Référence de la transaction SMS *</label>
+    <input type="text" id="momoTxId" placeholder="Ex: 245890123" required style="padding: 10px; font-size: 13px; border: 1px solid var(--gold-accent);">
+  </div>
+</div>
+
 <button class="btn-primary btn-whatsapp" onclick="sendTicketViaWhatsApp()">
-<span>📱</span> <span data-i18n="btnWhatsApp">Envoyer le ticket par WhatsApp</span>
+<span>📱</span> <span data-i18n="btnWhatsApp">Valider & Envoyer sur WhatsApp</span>
 </button>
 
 <button class="btn-primary btn-email" style="margin-top: 10px;" onclick="sendTicketViaEmail()">
@@ -854,7 +878,7 @@ const stepTitles = {
     3: "3. CHOIX DE LA CHAMBRE",
     4: "4. RESTAURATION & LOISIRS",
     5: "5. VOS COORDONNÉES",
-    6: "6. TICKET DE RÉSERVATION"
+    6: "6. TICKET DE RÉSERVATION & PAIEMENT"
   },
   EN: {
     1: "1. HOME",
@@ -862,7 +886,7 @@ const stepTitles = {
     3: "3. ROOM SELECTION",
     4: "4. DINING & EVENTS",
     5: "5. YOUR DETAILS",
-    6: "6. BOOKING TICKET"
+    6: "6. BOOKING TICKET & PAYMENT"
   }
 };
 
@@ -920,8 +944,8 @@ const i18n = {
     shuttleTitle: "🚙 Navette / Transfert Aéroport Maya-Maya (+15 000 FCFA)",
     shuttleDesc: "Prise en charge personnalisée à votre arrivée à l'aéroport de Brazzaville.",
     btnStep5: "Générer mon ticket de réservation",
-    step6Title: "Validation du Ticket",
-    step6Desc: "Voici votre ticket de réservation pour l'Edmond Hôtel. Transmettez-le à la réception pour finaliser les modalités de paiement.",
+    step6Title: "Validation & Paiement",
+    step6Desc: "Voici votre ticket de réservation pour l'Edmond Hôtel. Effectuez le règlement par Mobile Money puis validez en envoyant votre ticket à la réception.",
     tLblClient: "Client :",
     tLblPhone: "Téléphone :",
     tLblEmail: "Email :",
@@ -933,7 +957,7 @@ const i18n = {
     tLblShuttle: "Navette Aéroport :",
     tLblExtras: "Extras & Événements :",
     tLblTotal: "PRIX TOTAL :",
-    btnWhatsApp: "Envoyer le ticket par WhatsApp",
+    btnWhatsApp: "Valider & Envoyer par WhatsApp",
     btnEmail: "Envoyer le ticket par Email",
     rooftopModalTitle: "🍷 Restaurant Rooftop (6ᵉ étage)",
     rooftopModalDesc: "Situé en terrasse au 6ᵉ étage de l'Edmond Hôtel, notre restaurant panoramique vous propose une cuisine raffinée préparée par notre Chef. Venez découvrir nos nouveaux desserts artisanaux, nos cocktails signature et profiter d'une vue dégagée sur les lumières de Brazzaville.",
@@ -990,8 +1014,8 @@ const i18n = {
     shuttleTitle: "🚙 Maya-Maya Airport Shuttle (+15,000 FCFA)",
     shuttleDesc: "Personalized pick-up service upon your arrival at Maya-Maya Airport.",
     btnStep5: "Generate my booking ticket",
-    step6Title: "Ticket Confirmation",
-    step6Desc: "Here is your booking ticket. Send it to reception to confirm payment details.",
+    step6Title: "Validation & Payment",
+    step6Desc: "Here is your booking ticket. Make the Mobile Money transfer and confirm by sending your ticket to reception.",
     tLblClient: "Guest:",
     tLblPhone: "Phone:",
     tLblEmail: "Email:",
@@ -1003,7 +1027,7 @@ const i18n = {
     tLblShuttle: "Airport Shuttle:",
     tLblExtras: "Extras & Events:",
     tLblTotal: "TOTAL PRICE:",
-    btnWhatsApp: "Send ticket via WhatsApp",
+    btnWhatsApp: "Validate & Send via WhatsApp",
     btnEmail: "Send ticket via Email",
     rooftopModalTitle: "🍷 Rooftop Restaurant (6th Floor)",
     rooftopModalDesc: "Located on the 6th floor rooftop of Edmond Hotel, enjoy fine dining, artisan desserts, signature cocktails, and a breathtaking view of Brazzaville.",
@@ -1127,7 +1151,7 @@ function toggleExtra(extraId) {
   renderExtras();
 }
 
-/* INITIALISATION ET PARSAGE DES DATES (Date du jour même ou jours à venir uniquement) */
+/* INITIALISATION ET PARSAGE DES DATES */
 function initDates() {
   const today = new Date();
   const tomorrow = new Date(today);
@@ -1139,7 +1163,6 @@ function initDates() {
   const checkinEl = document.getElementById('checkin');
   const checkoutEl = document.getElementById('checkout');
 
-  // Interdiction de choisir des dates passées
   checkinEl.setAttribute('min', todayStr);
   checkoutEl.setAttribute('min', todayStr);
 
@@ -1357,9 +1380,9 @@ function loadMoreRooms() {
 function selectRoom(roomId) {
   const index = selectedRooms.findIndex(r => r.id === roomId);
   if (index > -1) {
-    selectedRooms.splice(index, 1); // Déselectionne si déjà sélectionnée
+    selectedRooms.splice(index, 1);
   } else {
-    selectedRooms.push(allRooms.find(r => r.id === roomId)); // Ajoute d'autres chambres
+    selectedRooms.push(allRooms.find(r => r.id === roomId));
   }
   renderRooms();
 }
@@ -1386,7 +1409,6 @@ function generateTicket() {
   const nights = getNightsCount();
   const hasShuttle = document.getElementById('airportShuttle').checked;
 
-  // Calcul Chambre(s)
   let baseTotal = 0;
   let roomNames = "Aucune chambre sélectionnée";
 
@@ -1395,10 +1417,8 @@ function generateTicket() {
     roomNames = selectedRooms.map(r => r.title).join(', ');
   }
 
-  // Calcul Navette
   const shuttleFee = hasShuttle ? 15000 : 0;
 
-  // Calcul Extras
   let extrasTotal = 0;
   const tExtrasList = document.getElementById('tExtrasList');
   tExtrasList.innerHTML = '';
@@ -1419,7 +1439,6 @@ function generateTicket() {
     document.getElementById('tExtrasSection').style.display = 'none';
   }
 
-  // CODE PROMO "EdmonHbrazza" (-10%)
   let discount = 0;
   const promoCode = document.getElementById('promoCode').value.trim();
   const subTotal = baseTotal + extrasTotal;
@@ -1468,7 +1487,7 @@ function generateTicket() {
   });
 }
 
-/* ENVOI DU TICKET WHATSAPP & EMAIL */
+/* ENVOI DU TICKET WHATSAPP & EMAIL AVEC VÉRIFICATION DE L'ID TRANSACTION MOMO */
 function sendTicketViaWhatsApp() {
   const ref = document.getElementById('ticketRefNumber').innerText;
   const client = document.getElementById('tClient').innerText;
@@ -1476,6 +1495,13 @@ function sendTicketViaWhatsApp() {
   const room = document.getElementById('tRoomName').innerText;
   const dates = document.getElementById('tDates').innerText;
   const total = document.getElementById('tTotalPrice').innerText;
+  const momoTxId = document.getElementById('momoTxId').value.trim();
+
+  if (!momoTxId) {
+    alert("Veuillez d'abord saisir l'ID / Référence de la transaction Mobile Money reçue par SMS.");
+    document.getElementById('momoTxId').focus();
+    return;
+  }
 
   let extrasStr = '';
   if (selectedExtras.length > 0) {
@@ -1487,7 +1513,7 @@ function sendTicketViaWhatsApp() {
 
   const promoStr = (document.getElementById('promoCode').value.trim().toLowerCase() === 'edmonhbrazza') ? '\n🎁 Code Promo : EdmonHbrazza (-10%)' : '';
 
-  const msg = `Bonjour Réception Edmond Hôtel,\n\nJe souhaite valider ma réservation :\n\n📌 ${ref}\n👤 Client : ${client}\n📞 Tél : ${phone}\n🏨 Chambre(s) : ${room}${extrasStr}${promoStr}\n📅 Séjour : ${dates}\n💰 Prix Total : ${total}\n\nMerci de me confirmer la réservation !`;
+  const msg = `Bonjour Réception Edmond Hôtel,\n\nJe confirme ma réservation suite au paiement Mobile Money :\n\n📌 ${ref}\n👤 Client : ${client}\n📞 Tél : ${phone}\n🏨 Chambre(s) : ${room}${extrasStr}${promoStr}\n📅 Séjour : ${dates}\n💰 Prix Total : ${total}\n💳 ID Transaction MoMo : ${momoTxId}\n\nMerci de me confirmer la réservation !`;
 
   window.open(`https://wa.me/242050447163?text=${encodeURIComponent(msg)}`, '_blank');
 }
@@ -1498,9 +1524,16 @@ function sendTicketViaEmail() {
   const room = document.getElementById('tRoomName').innerText;
   const dates = document.getElementById('tDates').innerText;
   const total = document.getElementById('tTotalPrice').innerText;
+  const momoTxId = document.getElementById('momoTxId').value.trim();
+
+  if (!momoTxId) {
+    alert("Veuillez d'abord saisir l'ID / Référence de la transaction Mobile Money reçue par SMS.");
+    document.getElementById('momoTxId').focus();
+    return;
+  }
 
   const subject = `Réservation Edmond Hôtel - ${ref} (${client})`;
-  const body = `Bonjour Réception Edmond Hôtel,\n\nVoici mon ticket de réservation :\n\n- ${ref}\n- Client : ${client}\n- Chambre(s) : ${room}\n- Dates : ${dates}\n- Total : ${total}\n\nMerci de confirmer ma demande.`;
+  const body = `Bonjour Réception Edmond Hôtel,\n\nVoici mon ticket de réservation avec le paiement Mobile Money :\n\n- ${ref}\n- Client : ${client}\n- Chambre(s) : ${room}\n- Dates : ${dates}\n- Total : ${total}\n- ID Transaction MoMo : ${momoTxId}\n\nMerci de confirmer ma demande.`;
 
   window.open(`mailto:officieledmondhotel@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
 }
