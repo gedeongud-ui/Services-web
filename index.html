@@ -293,6 +293,11 @@ input:invalid {
 .btn-whatsapp { background: var(--whatsapp-color); color: #fff; border: none; }
 .btn-email { background: var(--email-color); color: #fff; border: none; }
 
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+}
+
 /* CARTES ROOFTOP ET RESTAURANT */
 .feature-banner {
   background: linear-gradient(rgba(122, 12, 30, 0.85), rgba(80, 7, 19, 0.9)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80') center/cover;
@@ -431,6 +436,18 @@ input:invalid {
 .ticket-value { font-weight: 700; color: var(--dark-color); text-align: right; }
 .ticket-extras-list { font-size: 12px; color: var(--text-muted); margin-top: 5px; padding-left: 10px; border-left: 2px solid var(--gold-accent); }
 .ticket-total-row { border-top: 2px solid var(--dark-color); padding-top: 10px; margin-top: 12px; font-size: 16px; font-weight: 800; }
+
+.warning-no-selection {
+  background: #fff3cd;
+  border: 1px solid #ffe8a1;
+  color: #856404;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+  line-height: 1.4;
+}
 
 /* MODALES */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 300; justify-content: center; align-items: center; padding: 20px; }
@@ -703,6 +720,11 @@ Prise en charge personnalisée à votre arrivée à l'aéroport de Brazzaville.
 Voici votre ticket de réservation pour l'Edmond Hôtel. Transmettez-le directement à la réception par WhatsApp ou par Email pour finaliser votre séjour.
 </p>
 
+<!-- ALERTE SI AUCUNE CHAMBRE NI RESTAURANT/LOISIR SELECTIONNÉ -->
+<div id="selectionWarningBox" class="warning-no-selection" style="display: none;">
+⚠️ <strong>Attention :</strong> Vous n'avez sélectionné aucune chambre ni aucun service de restauration / loisirs. Veuillez sélectionner au moins une prestation avant d'envoyer votre réservation.
+</div>
+
 <div class="ticket-card" id="ticketPreview">
 <div class="ticket-header">
 <h3>🎟️ EDMOND HÔTEL - TICKET</h3>
@@ -743,7 +765,7 @@ Voici votre ticket de réservation pour l'Edmond Hôtel. Transmettez-le directem
 <span>📱</span> <span data-i18n="btnWhatsApp">Confirmer ma réservation sur WhatsApp</span>
 </button>
 
-<button class="btn-primary btn-email" style="margin-top: 10px;" onclick="sendTicketViaEmail()">
+<button class="btn-primary btn-email" id="btnEmailConfirm" style="margin-top: 10px;" onclick="sendTicketViaEmail()">
 <span>✉️</span> <span data-i18n="btnEmail">Envoyer le ticket par Email</span>
 </button>
 </div>
@@ -1256,6 +1278,7 @@ function toggleLanguage() {
 
   if (currentStep === 3) renderRooms();
   if (currentStep === 4) renderExtras();
+  if (currentStep === 6) generateTicket();
 }
 
 /* MISE À JOUR DU RÉSUMÉ ÉTAPE 3 */
@@ -1385,6 +1408,23 @@ function generateTicket() {
   const nights = getNightsCount();
   const hasShuttle = document.getElementById('airportShuttle').checked;
 
+  const warningBox = document.getElementById('selectionWarningBox');
+  const btnWa = document.getElementById('btnWhatsAppConfirm');
+  const btnMail = document.getElementById('btnEmailConfirm');
+
+  // VÉRIFICATION SI AUCUNE CHAMBRE NI SERVICE SELECTIONNÉ
+  const hasNoSelection = (selectedRooms.length === 0 && selectedExtras.length === 0);
+
+  if (hasNoSelection) {
+    warningBox.style.display = 'block';
+    btnWa.classList.add('btn-disabled');
+    btnMail.classList.add('btn-disabled');
+  } else {
+    warningBox.style.display = 'none';
+    btnWa.classList.remove('btn-disabled');
+    btnMail.classList.remove('btn-disabled');
+  }
+
   let baseTotal = 0;
   let roomNames = "Aucune chambre sélectionnée";
 
@@ -1453,18 +1493,27 @@ function generateTicket() {
   document.getElementById('tAirport').innerText = hasShuttle ? 'Oui (+15 000 FCFA)' : 'Non';
   document.getElementById('tTotalPrice').innerText = grandTotal.toLocaleString('fr-FR') + ' FCFA';
 
-  saveBookingToLocal({
-    ref: refNum,
-    client: `${prefix} ${fname} ${lname}`,
-    phone: phone,
-    room: roomNames,
-    dates: `Du ${formatDate(checkin)} au ${formatDate(checkout)}`,
-    total: grandTotal.toLocaleString('fr-FR') + ' FCFA'
-  });
+  if (!hasNoSelection) {
+    saveBookingToLocal({
+      ref: refNum,
+      client: `${prefix} ${fname} ${lname}`,
+      phone: phone,
+      room: roomNames,
+      dates: `Du ${formatDate(checkin)} au ${formatDate(checkout)}`,
+      total: grandTotal.toLocaleString('fr-FR') + ' FCFA'
+    });
+  }
 }
 
-/* ENVOI DU TICKET CONFIRMÉ SUR WHATSAPP & EMAIL */
+/* ENVOI DU TICKET CONFIRMÉ SUR WHATSAPP & EMAIL AVEC VÉRIFICATION STRICTE */
 function sendTicketViaWhatsApp() {
+  if (selectedRooms.length === 0 && selectedExtras.length === 0) {
+    alert(currentLang === 'FR' 
+      ? "Impossible d'envoyer la réservation : Vous n'avez sélectionné aucune chambre ni aucun service (restaurant / loisirs). Veuillez retourner sélectionner une offre." 
+      : "Cannot send reservation: You have not selected any room or service (restaurant / leisure). Please return and select an offer.");
+    return;
+  }
+
   const ref = document.getElementById('ticketRefNumber').innerText;
   const client = document.getElementById('tClient').innerText;
   const phone = document.getElementById('tPhone').innerText;
@@ -1488,6 +1537,13 @@ function sendTicketViaWhatsApp() {
 }
 
 function sendTicketViaEmail() {
+  if (selectedRooms.length === 0 && selectedExtras.length === 0) {
+    alert(currentLang === 'FR' 
+      ? "Impossible d'envoyer la réservation : Vous n'avez sélectionné aucune chambre ni aucun service (restaurant / loisirs). Veuillez retourner sélectionner une offre." 
+      : "Cannot send reservation: You have not selected any room or service (restaurant / leisure). Please return and select an offer.");
+    return;
+  }
+
   const ref = document.getElementById('ticketRefNumber').innerText;
   const client = document.getElementById('tClient').innerText;
   const room = document.getElementById('tRoomName').innerText;
